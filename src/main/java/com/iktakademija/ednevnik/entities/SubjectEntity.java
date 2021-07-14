@@ -6,19 +6,25 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.iktakademija.ednevnik.entities.enums.ESemester;
+import com.iktakademija.ednevnik.entities.enums.EYear;
 import com.iktakademija.ednevnik.security.Views;
 
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -35,17 +41,22 @@ public class SubjectEntity {
 	@JsonView(Views.Private.class)
 	@Column(nullable = false)
 	@NotBlank(message = "Subject name must not be left blank.")
-	@Size(min = 5, max = 30, message = "Subject name must be between {min} and {max} characters long.")
+	@Size(min = 2, max = 30, message = "Subject name must be between {min} and {max} characters long.")
 	private String nameOfSubject;
 	
 	@JsonView(Views.Private.class)
-	@NotBlank(message = "Weekly hours must not be left blank.")
-	@Size(min = 0, max = 40, message = "Weekly hours must be between {min} and {max}.")
+	@NotNull(message = "Weekly hours must not be left blank. Weekly hours must be between {min} and {max}.")
+	@Min(value = 0)
+	@Max(value = 40)
 	private Integer weeklyHours;
 	
 	@JsonView(Views.Private.class)
-	@NotBlank(message = "Semester must not be left blank. Accepted values are FIRST and SECOND.")
+	@Enumerated(EnumType.STRING)
 	private ESemester semester;
+	
+	@JsonView(Views.Private.class)
+	@Enumerated(EnumType.STRING)
+	private EYear subjectForYear;
 	
 	@JsonView(Views.Private.class)
 	@JsonManagedReference(value = "tss")
@@ -85,10 +96,6 @@ public class SubjectEntity {
 		this.nameOfSubject = nameOfSubject;
 	}
 
-	public Integer getWeeklyFond() {
-		return weeklyHours;
-	}
-
 	public Integer getWeeklyHours() {
 		return weeklyHours;
 	}
@@ -111,6 +118,14 @@ public class SubjectEntity {
 
 	public void setHasSubjects(List<TeacherSubjectEntity> hasSubjects) {
 		this.hasSubjects = hasSubjects;
+	}
+
+	public EYear getSubjectForYear() {
+		return subjectForYear;
+	}
+
+	public void setSubjectForYear(EYear subjectForYear) {
+		this.subjectForYear = subjectForYear;
 	}
 	
 	

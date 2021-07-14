@@ -33,7 +33,7 @@ public class TeacherSubjectPupilEntity {
 	@JsonBackReference(value = "tspp")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "pupil")
-	private PupilEntity pupil;
+	private StudentEntity pupil;
 	
 	@JsonView(Views.Private.class)
 	@JsonManagedReference(value = "gtsp")
@@ -56,11 +56,11 @@ public class TeacherSubjectPupilEntity {
 	}
 
 
-	public PupilEntity getPupil() {
+	public StudentEntity getPupil() {
 		return pupil;
 	}
 
-	public void setPupil(PupilEntity pupil) {
+	public void setPupil(StudentEntity pupil) {
 		this.pupil = pupil;
 	}
 

@@ -20,7 +20,7 @@ import com.iktakademija.ednevnik.security.Views;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "pupil")
-public class PupilEntity extends UserEntity {
+public class StudentEntity extends UserEntity {
 
 	@JsonView(Views.Private.class)
 	@JsonBackReference(value = "pp")
@@ -40,7 +40,7 @@ public class PupilEntity extends UserEntity {
 	private List<TeacherSubjectPupilEntity> listens = new ArrayList<>();
 
 
-	public PupilEntity() {
+	public StudentEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}

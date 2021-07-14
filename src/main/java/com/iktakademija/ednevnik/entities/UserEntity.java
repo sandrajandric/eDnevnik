@@ -43,7 +43,7 @@ public class UserEntity {
 	
 	@JsonView(Views.Private.class)
 	@Column(nullable = false, unique = true)
-	@Email
+	@Email(message = "Email is not valid.")
 	private String email;
 	
 	@JsonView(Views.Public.class)

@@ -33,14 +33,14 @@ public class ClassController {
 	}
 	
 	// lista svih odeljenja
-	@RequestMapping(method = RequestMethod.GET, value = "/")
+	@RequestMapping(method = RequestMethod.GET, value = "")
 	public ResponseEntity<?> getAllClasses() {
-		if (classRepository.findAll() != null) {
-			List<ClassEntity> classes = new ArrayList<>();
-			classes = (List<ClassEntity>) classRepository.findAll();
+		List<ClassEntity> classes = new ArrayList<>();
+		classes = (List<ClassEntity>) classRepository.findAll();
+		if (!classes.isEmpty()) {
 			return new ResponseEntity<List<ClassEntity>>(classes, HttpStatus.OK);
 		} else {
-			return new  ResponseEntity<RESTError>(new RESTError(1, "Classes not found"), HttpStatus.NOT_FOUND);
+			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Classes not found"), HttpStatus.NOT_FOUND);
 		}
 	}
 	
@@ -51,7 +51,7 @@ public class ClassController {
 			ClassEntity classEntity = classRepository.findById(id).get();
 			return new ResponseEntity<ClassEntity>(classEntity, HttpStatus.OK);
 		} else {
-			return new  ResponseEntity<RESTError>(new RESTError(3, "Class with id number " + id + " not found"), HttpStatus.NOT_FOUND);
+			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + id + " not found"), HttpStatus.NOT_FOUND);
 		}
 	}
 	
@@ -95,7 +95,7 @@ public class ClassController {
 			return new ResponseEntity<ClassEntity>(updatedClass, HttpStatus.OK);
 		}
 
-		return null;
+		return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + id + " not found"), HttpStatus.NOT_FOUND);
 	}
 	
 	// obrisi odeljenje
@@ -105,7 +105,7 @@ public class ClassController {
 			classRepository.deleteById(id);
 			return new ResponseEntity<ClassEntity>(HttpStatus.OK);
 		} else {
-			return new  ResponseEntity<RESTError>(new RESTError(2, "Class not found"), HttpStatus.NOT_FOUND);
+			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + id + " not found"), HttpStatus.NOT_FOUND);
 		}
 	}
 }

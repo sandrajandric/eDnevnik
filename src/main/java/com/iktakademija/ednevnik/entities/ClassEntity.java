@@ -52,7 +52,7 @@ public class ClassEntity {
 	@JsonView(Views.Private.class)
 	@JsonManagedReference(value = "pc")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "classs")
-	private List<PupilEntity> pupils = new ArrayList<>();
+	private List<StudentEntity> pupils = new ArrayList<>();
 	
 	@OneToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "homeroomTeacher")
@@ -91,11 +91,11 @@ public class ClassEntity {
 		this.year = year;
 	}
 
-	public List<PupilEntity> getPupils() {
+	public List<StudentEntity> getPupils() {
 		return pupils;
 	}
 
-	public void setPupils(List<PupilEntity> pupils) {
+	public void setPupils(List<StudentEntity> pupils) {
 		this.pupils = pupils;
 	}
 

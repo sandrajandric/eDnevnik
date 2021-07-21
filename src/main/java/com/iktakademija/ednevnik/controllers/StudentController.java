@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.iktakademija.ednevnik.controllers.util.RESTError;
 import com.iktakademija.ednevnik.entities.StudentEntity;
+import com.iktakademija.ednevnik.entities.dto.UserDTO;
 import com.iktakademija.ednevnik.repositories.StudentRepository;
 
 @RestController
@@ -56,18 +57,18 @@ public class StudentController {
 	
 	// dodaj novog ucenika
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<?> createStudent(@RequestBody StudentEntity studentEntity,
+	public ResponseEntity<?> createStudent(@RequestBody UserDTO userDTO,
 			 BindingResult result) {
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 		}
 
 		StudentEntity newStudent = new StudentEntity();
-		newStudent.setName(studentEntity.getName());
-		newStudent.setSurname(studentEntity.getSurname());
-		newStudent.setEmail(studentEntity.getEmail());
-		newStudent.setPassword(studentEntity.getPassword());
-		newStudent.setUsername(studentEntity.getUsername());
+		newStudent.setName(userDTO.getName());
+		newStudent.setSurname(userDTO.getSurname());
+		newStudent.setEmail(userDTO.getEmail());
+		newStudent.setPassword(userDTO.getPassword());
+		newStudent.setUsername(userDTO.getUsername());
 
 		studentRepository.save(newStudent);
 		return new ResponseEntity<StudentEntity>(newStudent, HttpStatus.CREATED);
@@ -76,7 +77,7 @@ public class StudentController {
 	// izmeni ucenika
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
 	public ResponseEntity<?> updateStudent(@PathVariable Integer id, 
-			@RequestBody StudentEntity updatedStudent, BindingResult result) {
+			@RequestBody UserDTO userDTO, BindingResult result) {
 		
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
@@ -85,25 +86,24 @@ public class StudentController {
 		if (studentRepository.existsById(id)) {
 			StudentEntity studentEntity = studentRepository.findById(id).get();
 
-			if (updatedStudent.getName() != null) {
-				studentEntity.setName(updatedStudent.getName());
+			if (userDTO.getName() != null) {
+				studentEntity.setName(userDTO.getName());
 			}
-			if (updatedStudent.getSurname() != null) {
-				studentEntity.setSurname(updatedStudent.getSurname());
+			if (userDTO.getSurname() != null) {
+				studentEntity.setSurname(userDTO.getSurname());
 			}
-			if (updatedStudent.getEmail() != null) {
-				studentEntity.setEmail(updatedStudent.getEmail());
+			if (userDTO.getEmail() != null) {
+				studentEntity.setEmail(userDTO.getEmail());
 			}
-			if (updatedStudent.getPassword() != null) {
-				studentEntity.setPassword(updatedStudent.getPassword());
+			if (userDTO.getPassword() != null) {
+				studentEntity.setPassword(userDTO.getPassword());
 			}
-			if (updatedStudent.getUsername() != null) {
-				studentEntity.setUsername(updatedStudent.getUsername());
+			if (userDTO.getUsername() != null) {
+				studentEntity.setUsername(userDTO.getUsername());
 			}
-		
 			
-			studentRepository.save(updatedStudent);
-			return new ResponseEntity<StudentEntity>(updatedStudent, HttpStatus.OK);
+			studentRepository.save(studentEntity);
+			return new ResponseEntity<StudentEntity>(studentEntity, HttpStatus.OK);
 		}
 		else {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Student with id number " + id + " not found"), HttpStatus.NOT_FOUND);

@@ -22,20 +22,19 @@ public class ParentEntity extends UserEntity {
 	@JsonView(Views.Private.class)
 	@JsonManagedReference(value = "pp")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "parent")
-	private List<StudentEntity> pupils = new ArrayList<>();
+	private List<StudentEntity> students = new ArrayList<>();
 
 	public ParentEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public List<StudentEntity> getPupils() {
-		return pupils;
+	public List<StudentEntity> getStudents() {
+		return students;
 	}
 
-	public void setPupils(List<StudentEntity> pupils) {
-		this.pupils = pupils;
+	public void setStudents(List<StudentEntity> students) {
+		this.students = students;
 	}
-	
 	
 }

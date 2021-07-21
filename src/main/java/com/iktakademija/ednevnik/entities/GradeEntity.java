@@ -49,7 +49,7 @@ public class GradeEntity {
 	@JsonBackReference(value = "gtsp")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "teacher_subject_pupil")
-	private TeacherSubjectPupilEntity teacherSubjectPupil;
+	private TeacherSubjectStudentEntity teacherSubjectPupil;
 	
 	@JsonView(Views.Admin.class)
 	@Version
@@ -96,11 +96,11 @@ public class GradeEntity {
 		this.date = date;
 	}
 
-	public TeacherSubjectPupilEntity getTeacherSubjectPupil() {
+	public TeacherSubjectStudentEntity getTeacherSubjectPupil() {
 		return teacherSubjectPupil;
 	}
 
-	public void setTeacherSubjectPupil(TeacherSubjectPupilEntity teacherSubjectPupil) {
+	public void setTeacherSubjectPupil(TeacherSubjectStudentEntity teacherSubjectPupil) {
 		this.teacherSubjectPupil = teacherSubjectPupil;
 	}
 	

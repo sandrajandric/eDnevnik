@@ -113,4 +113,7 @@ public class SubjectController {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + id + " not found"), HttpStatus.NOT_FOUND);
 		}
 	}
+	
+	// dodaj nastavnika za predmet
+	// obrisi nastavnika iz predmeta
 }

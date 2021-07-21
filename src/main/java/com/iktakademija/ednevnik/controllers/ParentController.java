@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.iktakademija.ednevnik.controllers.util.RESTError;
 import com.iktakademija.ednevnik.entities.ParentEntity;
+import com.iktakademija.ednevnik.entities.dto.UserDTO;
 import com.iktakademija.ednevnik.repositories.ParentRepository;
 
 @RestController
@@ -56,18 +57,18 @@ public class ParentController {
 	
 	// dodaj novog roditelja
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<?> createParent(@RequestBody ParentEntity parentEntity,
+	public ResponseEntity<?> createParent(@RequestBody UserDTO userDTO,
 			 BindingResult result) {
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 		}
 
 		ParentEntity newParent = new ParentEntity();
-		newParent.setName(parentEntity.getName());
-		newParent.setSurname(parentEntity.getSurname());
-		newParent.setEmail(parentEntity.getEmail());
-		newParent.setPassword(parentEntity.getPassword());
-		newParent.setUsername(parentEntity.getUsername());
+		newParent.setName(userDTO.getName());
+		newParent.setSurname(userDTO.getSurname());
+		newParent.setEmail(userDTO.getEmail());
+		newParent.setPassword(userDTO.getPassword());
+		newParent.setUsername(userDTO.getUsername());
 
 		parentRepository.save(newParent);
 		return new ResponseEntity<ParentEntity>(newParent, HttpStatus.CREATED);
@@ -76,7 +77,7 @@ public class ParentController {
 	// izmeni roditelja
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
 	public ResponseEntity<?> updateParent(@PathVariable Integer id, 
-			@RequestBody ParentEntity updatedParent, BindingResult result) {
+			@RequestBody UserDTO userDTO, BindingResult result) {
 		
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
@@ -85,25 +86,25 @@ public class ParentController {
 		if (parentRepository.existsById(id)) {
 			ParentEntity parentEntity = parentRepository.findById(id).get();
 
-			if (updatedParent.getName() != null) {
-				parentEntity.setName(updatedParent.getName());
+			if (userDTO.getName() != null) {
+				parentEntity.setName(userDTO.getName());
 			}
-			if (updatedParent.getSurname() != null) {
-				parentEntity.setSurname(updatedParent.getSurname());
+			if (userDTO.getSurname() != null) {
+				parentEntity.setSurname(userDTO.getSurname());
 			}
-			if (updatedParent.getEmail() != null) {
-				parentEntity.setEmail(updatedParent.getEmail());
+			if (userDTO.getEmail() != null) {
+				parentEntity.setEmail(userDTO.getEmail());
 			}
-			if (updatedParent.getPassword() != null) {
-				parentEntity.setPassword(updatedParent.getPassword());
+			if (userDTO.getPassword() != null) {
+				parentEntity.setPassword(userDTO.getPassword());
 			}
-			if (updatedParent.getUsername() != null) {
-				parentEntity.setUsername(updatedParent.getUsername());
+			if (userDTO.getUsername() != null) {
+				parentEntity.setUsername(userDTO.getUsername());
 			}
 		
 			
-			parentRepository.save(updatedParent);
-			return new ResponseEntity<ParentEntity>(updatedParent, HttpStatus.OK);
+			parentRepository.save(parentEntity);
+			return new ResponseEntity<ParentEntity>(parentEntity, HttpStatus.OK);
 		}
 		else {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Parent with id number " + id + " not found"), HttpStatus.NOT_FOUND);

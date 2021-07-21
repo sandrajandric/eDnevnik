@@ -36,8 +36,8 @@ public class StudentEntity extends UserEntity {
 	
 	@JsonView(Views.Private.class)
 	@JsonManagedReference(value = "tspp")
-	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "pupil")
-	private List<TeacherSubjectPupilEntity> listens = new ArrayList<>();
+	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "student")
+	private List<TeacherSubjectStudentEntity> listens = new ArrayList<>();
 
 
 	public StudentEntity() {
@@ -61,11 +61,11 @@ public class StudentEntity extends UserEntity {
 		this.classs = classs;
 	}
 
-	public List<TeacherSubjectPupilEntity> getListens() {
+	public List<TeacherSubjectStudentEntity> getListens() {
 		return listens;
 	}
 
-	public void setListens(List<TeacherSubjectPupilEntity> listens) {
+	public void setListens(List<TeacherSubjectStudentEntity> listens) {
 		this.listens = listens;
 	}
 	

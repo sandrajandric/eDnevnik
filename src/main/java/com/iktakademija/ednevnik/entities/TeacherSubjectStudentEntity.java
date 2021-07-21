@@ -21,8 +21,8 @@ import com.iktakademija.ednevnik.security.Views;
 
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
-@Table(name = "teacher_subject_pupil")
-public class TeacherSubjectPupilEntity {
+@Table(name = "teacher_subject_student")
+public class TeacherSubjectStudentEntity {
 
 	@JsonView(Views.Admin.class)
 	@Id
@@ -32,16 +32,16 @@ public class TeacherSubjectPupilEntity {
 	@JsonView(Views.Private.class)
 	@JsonBackReference(value = "tspp")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
-	@JoinColumn(name = "pupil")
-	private StudentEntity pupil;
+	@JoinColumn(name = "student")
+	private StudentEntity student;
 	
 	@JsonView(Views.Private.class)
 	@JsonManagedReference(value = "gtsp")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
-	@JoinColumn(name = "teacher_subject_pupil")
+	@JoinColumn(name = "teacher_subject_student")
 	private List<GradeEntity> hasGrades = new ArrayList<>();
 
-	public TeacherSubjectPupilEntity() {
+	public TeacherSubjectStudentEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -57,11 +57,11 @@ public class TeacherSubjectPupilEntity {
 
 
 	public StudentEntity getPupil() {
-		return pupil;
+		return student;
 	}
 
-	public void setPupil(StudentEntity pupil) {
-		this.pupil = pupil;
+	public void setPupil(StudentEntity student) {
+		this.student = student;
 	}
 
 	public List<GradeEntity> getHasGrades() {

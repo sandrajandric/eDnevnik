@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.iktakademija.ednevnik.controllers.util.RESTError;
 import com.iktakademija.ednevnik.entities.TeacherEntity;
+import com.iktakademija.ednevnik.entities.dto.UserDTO;
 import com.iktakademija.ednevnik.repositories.TeacherRepository;
 
 @RestController
@@ -56,18 +57,18 @@ public class TeacherController {
 	
 	// dodaj novog nastavnika
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<?> createTeacher(@RequestBody TeacherEntity teacherEntity,
+	public ResponseEntity<?> createTeacher(@RequestBody UserDTO userDTO,
 			 BindingResult result) {
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 		}
 
 		TeacherEntity newTeacher = new TeacherEntity();
-		newTeacher.setName(teacherEntity.getName());
-		newTeacher.setSurname(teacherEntity.getSurname());
-		newTeacher.setEmail(teacherEntity.getEmail());
-		newTeacher.setPassword(teacherEntity.getPassword());
-		newTeacher.setUsername(teacherEntity.getUsername());
+		newTeacher.setName(userDTO.getName());
+		newTeacher.setSurname(userDTO.getSurname());
+		newTeacher.setEmail(userDTO.getEmail());
+		newTeacher.setPassword(userDTO.getPassword());
+		newTeacher.setUsername(userDTO.getUsername());
 
 		teacherRepository.save(newTeacher);
 		return new ResponseEntity<TeacherEntity>(newTeacher, HttpStatus.CREATED);
@@ -76,7 +77,7 @@ public class TeacherController {
 	// izmeni nastavnika
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
 	public ResponseEntity<?> updateTeacher(@PathVariable Integer id, 
-			@RequestBody TeacherEntity updatedTeacher, BindingResult result) {
+			@RequestBody UserDTO userDTO, BindingResult result) {
 		
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
@@ -85,25 +86,25 @@ public class TeacherController {
 		if (teacherRepository.existsById(id)) {
 			TeacherEntity teacherEntity = teacherRepository.findById(id).get();
 
-			if (updatedTeacher.getName() != null) {
-				teacherEntity.setName(updatedTeacher.getName());
+			if (userDTO.getName() != null) {
+				teacherEntity.setName(userDTO.getName());
 			}
-			if (updatedTeacher.getSurname() != null) {
-				teacherEntity.setSurname(updatedTeacher.getSurname());
+			if (userDTO.getSurname() != null) {
+				teacherEntity.setSurname(userDTO.getSurname());
 			}
-			if (updatedTeacher.getEmail() != null) {
-				teacherEntity.setEmail(updatedTeacher.getEmail());
+			if (userDTO.getEmail() != null) {
+				teacherEntity.setEmail(userDTO.getEmail());
 			}
-			if (updatedTeacher.getPassword() != null) {
-				teacherEntity.setPassword(updatedTeacher.getPassword());
+			if (userDTO.getPassword() != null) {
+				teacherEntity.setPassword(userDTO.getPassword());
 			}
-			if (updatedTeacher.getUsername() != null) {
-				teacherEntity.setUsername(updatedTeacher.getUsername());
+			if (userDTO.getUsername() != null) {
+				teacherEntity.setUsername(userDTO.getUsername());
 			}
 		
 			
-			teacherRepository.save(updatedTeacher);
-			return new ResponseEntity<TeacherEntity>(updatedTeacher, HttpStatus.OK);
+			teacherRepository.save(teacherEntity);
+			return new ResponseEntity<TeacherEntity>(teacherEntity, HttpStatus.OK);
 		}
 		else {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Teacher with id number " + id + " not found"), HttpStatus.NOT_FOUND);

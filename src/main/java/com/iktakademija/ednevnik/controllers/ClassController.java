@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.iktakademija.ednevnik.controllers.util.RESTError;
 import com.iktakademija.ednevnik.entities.ClassEntity;
+import com.iktakademija.ednevnik.entities.StudentEntity;
 import com.iktakademija.ednevnik.entities.enums.EYear;
 import com.iktakademija.ednevnik.repositories.ClassRepository;
+import com.iktakademija.ednevnik.repositories.StudentRepository;
 
 @RestController
 @RequestMapping(value = "/api/v1/classes")
@@ -26,6 +28,9 @@ public class ClassController {
 
 	@Autowired
 	private ClassRepository classRepository;
+	
+	@Autowired
+	private StudentRepository studentRepository;
 	
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage)
@@ -103,9 +108,66 @@ public class ClassController {
 	public ResponseEntity<?> deleteClass(@PathVariable Integer id) {
 		if (classRepository.existsById(id)) {
 			classRepository.deleteById(id);
+			classRepository.save(classRepository.findById(id).get());
 			return new ResponseEntity<ClassEntity>(HttpStatus.OK);
 		} else {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + id + " not found"), HttpStatus.NOT_FOUND);
 		}
 	}
+	 
+	// dodaj ucenika u odeljenje
+	@RequestMapping(method = RequestMethod.PUT, value = "/{classId}/assignStudent/{studentId}")
+	public ResponseEntity<?> addStudentToClass(@PathVariable Integer classId, 
+			@PathVariable Integer studentId) {
+		if (classRepository.existsById(classId) && studentRepository.existsById(studentId)) {
+			ClassEntity classs = classRepository.findById(classId).get();
+			StudentEntity student = studentRepository.findById(studentId).get();
+			List<StudentEntity> students = new ArrayList<>();
+			student.setClasss(classs);
+			students.add(student);
+			classs.setStudents(students);
+			classRepository.save(classRepository.findById(classId).get());
+			studentRepository.save(studentRepository.findById(studentId).get());
+			return new ResponseEntity<ClassEntity>(classs, HttpStatus.OK);
+		} else {
+			if (!classRepository.existsById(classId)) {
+				return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + classId+ " not found"), HttpStatus.NOT_FOUND);
+			} else {
+				return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Student with id number " + studentId + " not found"), HttpStatus.NOT_FOUND);
+			}
+		}
+	}
+	
+	// obrisi ucenika iz odeljenja
+	@RequestMapping(method = RequestMethod.PUT, value = "/{classId}/removeStudent/{studentId}")
+	public ResponseEntity<?> removeStudentFromClass(@PathVariable Integer classId, 
+			@PathVariable Integer studentId) {
+		if (classRepository.existsById(classId) && studentRepository.existsById(studentId)) {
+			ClassEntity classs = classRepository.findById(classId).get();
+			StudentEntity student = studentRepository.findById(studentId).get();
+			List<StudentEntity> students = (List<StudentEntity>) studentRepository.findAll();
+			students.remove(student);
+			List<StudentEntity> studentsNew = (List<StudentEntity>) studentRepository.findAll();
+			student.setClasss(null);
+			classs.setStudents(studentsNew);
+			classRepository.save(classRepository.findById(classId).get());
+			studentRepository.save(studentRepository.findById(studentId).get());
+			return new ResponseEntity<ClassEntity>(classs, HttpStatus.OK);
+		} else {
+			if (!classRepository.existsById(classId)) {
+				return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + classId+ " not found"), HttpStatus.NOT_FOUND);
+			} else {
+				return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Student with id number " + studentId + " not found"), HttpStatus.NOT_FOUND);
+			}
+		}
+	}
+	
+	// TODO dodaj odeljenskog
+	
+	// TODO obrisi odeljenskog
+	
+	// TODO dodaj predmet
+	// provera da li je predmet za tu godinu, da li se year poklapaju
+	
+	// TODO obrisi predmet
 }

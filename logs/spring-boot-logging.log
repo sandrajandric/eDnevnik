@@ -931,3 +931,22 @@ Caused by: java.lang.Error: Unresolved compilation problems:
 2021-07-21 10:57:04.709  INFO 18828 --- [RMI TCP Connection(37)-127.0.0.1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
 2021-07-21 10:57:04.710  INFO 18828 --- [RMI TCP Connection(37)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Shutdown initiated...
 2021-07-21 10:57:04.712  INFO 18828 --- [RMI TCP Connection(37)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Shutdown completed.
+2021-07-21 10:57:11.851  INFO 14236 --- [restartedMain] c.i.ednevnik.EDnevnikApplication         : Starting EDnevnikApplication using Java 15.0.2 on DESKTOP-BKFD4BS with PID 14236 (D:\Sandra\ICTVojvodina\4.deoBekend\Bekend_projekti\eDnevnik\target\classes started by djuri in D:\Sandra\ICTVojvodina\4.deoBekend\Bekend_projekti\eDnevnik)
+2021-07-21 10:57:11.854  INFO 14236 --- [restartedMain] c.i.ednevnik.EDnevnikApplication         : No active profile set, falling back to default profiles: default
+2021-07-21 10:57:11.889  INFO 14236 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2021-07-21 10:57:11.889  INFO 14236 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2021-07-21 10:57:12.590  INFO 14236 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2021-07-21 10:57:12.633  INFO 14236 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 37 ms. Found 6 JPA repository interfaces.
+2021-07-21 10:57:13.071  INFO 14236 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8090 (http)
+2021-07-21 10:57:13.079  INFO 14236 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2021-07-21 10:57:13.080  INFO 14236 --- [restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.48]
+2021-07-21 10:57:13.150  INFO 14236 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2021-07-21 10:57:13.151  INFO 14236 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1261 ms
+2021-07-21 10:57:13.487  INFO 14236 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2021-07-21 10:57:13.872  INFO 14236 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2021-07-21 10:57:14.691  INFO 14236 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2021-07-21 10:57:14.960  WARN 14236 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2021-07-21 10:57:15.159  WARN 14236 --- [restartedMain] ion$DefaultTemplateResolverConfiguration : Cannot find template location: classpath:/templates/ (please add some templates or check your Thymeleaf configuration)
+2021-07-21 10:57:15.245  INFO 14236 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2021-07-21 10:57:15.281  INFO 14236 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8090 (http) with context path ''
+2021-07-21 10:57:15.289  INFO 14236 --- [restartedMain] c.i.ednevnik.EDnevnikApplication         : Started EDnevnikApplication in 3.758 seconds (JVM running for 6.228)

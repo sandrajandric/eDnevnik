@@ -232,11 +232,5 @@ public class ClassController {
 			}
 		}
 	}
-	// TODO dodaj predmet 
-	
 
-	
-	// provera da li je predmet za tu godinu, da li se year poklapaju
-
-	// TODO obrisi predmet
 }

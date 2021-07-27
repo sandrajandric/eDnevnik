@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iktakademija.ednevnik.controllers.util.RESTError;
+import com.iktakademija.ednevnik.entities.ParentEntity;
 import com.iktakademija.ednevnik.entities.StudentEntity;
+import com.iktakademija.ednevnik.entities.TeacherSubjectEntity;
 import com.iktakademija.ednevnik.entities.dto.UserDTO;
+import com.iktakademija.ednevnik.repositories.ParentRepository;
 import com.iktakademija.ednevnik.repositories.StudentRepository;
 
 @RestController
@@ -26,6 +29,9 @@ public class StudentController {
 
 	@Autowired
 	private StudentRepository studentRepository;
+	
+	@Autowired
+	private ParentRepository parentRepository;
 	
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage)
@@ -120,4 +126,48 @@ public class StudentController {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Student with id number " + id + " not found"), HttpStatus.NOT_FOUND);
 		}
 	}
+	
+	//  dodaj roditelja
+		@RequestMapping(method = RequestMethod.PUT, value = "/{studentId}/assignParent/{parentId}")
+		public ResponseEntity<?> assignParent(@PathVariable Integer parentId, 
+				@PathVariable Integer studentId) {
+			if (parentRepository.existsById(parentId) && studentRepository.existsById(studentId)) {
+				ParentEntity parent = parentRepository.findById(parentId).get();
+				StudentEntity student = studentRepository.findById(studentId).get();
+				List<StudentEntity> students = new ArrayList<>();
+				if (!(studentRepository.existsParentStudent(parentId, studentId) >= 1)) {
+					student.setParent(parent);
+					students.add(student);
+					parent.setStudents(students);		
+				} else {
+					return new ResponseEntity<RESTError>(new RESTError(HttpStatus.BAD_REQUEST.value(),
+							"Parent with id number " + parentId + " is already assigned to student with id number " + studentId), HttpStatus.BAD_REQUEST);
+				}
+				parentRepository.save(parent);
+				studentRepository.save(student);
+				return new ResponseEntity<ParentEntity>(parent, HttpStatus.OK);
+			} else {
+				if (!parentRepository.existsById(parentId)) {
+					return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Parent with id number " + parentId + " not found"), HttpStatus.NOT_FOUND);
+				} else {
+					return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Student with id number " + studentId + " not found"), HttpStatus.NOT_FOUND);
+				}
+			}
+		}
+		
+		// obrisi ucenika
+		@RequestMapping(method = RequestMethod.PUT, value = "/{studentId}/removeParentFromStudent/{parentId}")
+		public ResponseEntity<?> removeParentFromStudent(@PathVariable Integer studentId,
+				@PathVariable Integer parentId) {
+			if (studentRepository.existsParentStudent(parentId, studentId) >= 1) {
+				StudentEntity student = studentRepository.findById(studentId).get();
+				student.setParent(null);
+				studentRepository.save(student);
+				return new ResponseEntity<StudentEntity>(student, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(),
+								"Parent with id number " + parentId + " is not assigned to student " + studentId),
+						HttpStatus.NOT_FOUND);
+			}
+		}
 }

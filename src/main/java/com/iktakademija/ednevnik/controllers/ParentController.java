@@ -16,9 +16,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iktakademija.ednevnik.controllers.util.RESTError;
+import com.iktakademija.ednevnik.entities.ClassEntity;
 import com.iktakademija.ednevnik.entities.ParentEntity;
+import com.iktakademija.ednevnik.entities.StudentEntity;
+import com.iktakademija.ednevnik.entities.SubjectEntity;
+import com.iktakademija.ednevnik.entities.TeacherEntity;
+import com.iktakademija.ednevnik.entities.TeacherSubjectEntity;
 import com.iktakademija.ednevnik.entities.dto.UserDTO;
 import com.iktakademija.ednevnik.repositories.ParentRepository;
+import com.iktakademija.ednevnik.repositories.StudentRepository;
 
 @RestController
 @RequestMapping(value = "/api/v1/parents")
@@ -121,4 +127,6 @@ public class ParentController {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Parent with id number " + id + " not found"), HttpStatus.NOT_FOUND);
 		}
 	}
+	
+	
 }

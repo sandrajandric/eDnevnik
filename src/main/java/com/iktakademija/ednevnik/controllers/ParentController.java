@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import com.iktakademija.ednevnik.entities.SubjectEntity;
 import com.iktakademija.ednevnik.entities.TeacherEntity;
 import com.iktakademija.ednevnik.entities.TeacherSubjectEntity;
 import com.iktakademija.ednevnik.entities.dto.UserDTO;
+import com.iktakademija.ednevnik.entities.dto.UserDTOPut;
 import com.iktakademija.ednevnik.repositories.ParentRepository;
 import com.iktakademija.ednevnik.repositories.StudentRepository;
 
@@ -63,7 +66,7 @@ public class ParentController {
 	
 	// dodaj novog roditelja
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<?> createParent(@RequestBody UserDTO userDTO,
+	public ResponseEntity<?> createParent(@Valid @RequestBody UserDTO userDTO,
 			 BindingResult result) {
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
@@ -83,7 +86,7 @@ public class ParentController {
 	// izmeni roditelja
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
 	public ResponseEntity<?> updateParent(@PathVariable Integer id, 
-			@RequestBody UserDTO userDTO, BindingResult result) {
+			@Valid @RequestBody UserDTOPut  userDTO, BindingResult result) {
 		
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);

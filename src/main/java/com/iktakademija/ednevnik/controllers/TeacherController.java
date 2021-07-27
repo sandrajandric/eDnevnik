@@ -22,6 +22,7 @@ import com.iktakademija.ednevnik.entities.SubjectEntity;
 import com.iktakademija.ednevnik.entities.TeacherEntity;
 import com.iktakademija.ednevnik.entities.TeacherSubjectEntity;
 import com.iktakademija.ednevnik.entities.dto.UserDTO;
+import com.iktakademija.ednevnik.entities.dto.UserDTOPut;
 import com.iktakademija.ednevnik.repositories.SubjectRepository;
 import com.iktakademija.ednevnik.repositories.TeacherRepository;
 import com.iktakademija.ednevnik.repositories.TeacherSubjectRepository;
@@ -89,7 +90,7 @@ public class TeacherController {
 
 	// izmeni nastavnika
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-	public ResponseEntity<?> updateTeacher(@PathVariable Integer id, @RequestBody UserDTO userDTO,
+	public ResponseEntity<?> updateTeacher(@PathVariable Integer id, @RequestBody UserDTOPut userDTO,
 			BindingResult result) {
 
 		if (result.hasErrors()) {

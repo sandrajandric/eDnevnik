@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iktakademija.ednevnik.controllers.util.RESTError;
 import com.iktakademija.ednevnik.entities.ParentEntity;
 import com.iktakademija.ednevnik.entities.StudentEntity;
-import com.iktakademija.ednevnik.entities.TeacherSubjectEntity;
 import com.iktakademija.ednevnik.entities.dto.UserDTO;
+import com.iktakademija.ednevnik.entities.dto.UserDTOPut;
 import com.iktakademija.ednevnik.repositories.ParentRepository;
 import com.iktakademija.ednevnik.repositories.StudentRepository;
 
@@ -83,7 +83,7 @@ public class StudentController {
 	// izmeni ucenika
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
 	public ResponseEntity<?> updateStudent(@PathVariable Integer id, 
-			@RequestBody UserDTO userDTO, BindingResult result) {
+			@RequestBody UserDTOPut userDTO, BindingResult result) {
 		
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);

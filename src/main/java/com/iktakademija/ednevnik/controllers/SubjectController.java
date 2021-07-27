@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iktakademija.ednevnik.controllers.util.RESTError;
 import com.iktakademija.ednevnik.entities.SubjectEntity;
 import com.iktakademija.ednevnik.entities.dto.SubjectDTO;
+import com.iktakademija.ednevnik.entities.dto.SubjectDTOPut;
 import com.iktakademija.ednevnik.repositories.SubjectRepository;
 
 @RestController
@@ -76,7 +77,7 @@ public class SubjectController {
 	// izmeni predmet
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
 	public ResponseEntity<?> updateSubject(@PathVariable Integer id, 
-			@RequestBody SubjectDTO subjectDTO, BindingResult result) {
+			@RequestBody SubjectDTOPut subjectDTO, BindingResult result) {
 		
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);

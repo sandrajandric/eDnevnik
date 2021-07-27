@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import com.iktakademija.ednevnik.entities.ClassEntity;
 import com.iktakademija.ednevnik.entities.StudentEntity;
 import com.iktakademija.ednevnik.entities.TeacherEntity;
 import com.iktakademija.ednevnik.entities.dto.ClassDTO;
+import com.iktakademija.ednevnik.entities.dto.ClassDTOPut;
 import com.iktakademija.ednevnik.entities.enums.EYear;
 import com.iktakademija.ednevnik.repositories.ClassRepository;
 import com.iktakademija.ednevnik.repositories.StudentRepository;
@@ -71,7 +74,7 @@ public class ClassController {
 
 	// dodaj novo odeljenje
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<?> createClass(@RequestBody ClassDTO classDTO, BindingResult result) {
+	public ResponseEntity<?> createClass(@Valid @RequestBody ClassDTO classDTO, BindingResult result) {
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 		}
@@ -96,7 +99,7 @@ public class ClassController {
 	// izmeni odeljenje
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
 	public ResponseEntity<?> updateClass(@PathVariable Integer id, 
-			@RequestBody ClassDTO classDTO, BindingResult result) {
+			@Valid @RequestBody ClassDTOPut classDTO, BindingResult result) {
 		
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);

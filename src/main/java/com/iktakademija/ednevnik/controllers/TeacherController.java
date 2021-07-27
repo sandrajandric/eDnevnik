@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -29,6 +30,7 @@ import com.iktakademija.ednevnik.repositories.TeacherSubjectRepository;
 
 @RestController
 @RequestMapping(value = "/api/v1/teachers")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class TeacherController {
 
 	@Autowired

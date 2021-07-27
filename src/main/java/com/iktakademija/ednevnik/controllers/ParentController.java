@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +32,7 @@ import com.iktakademija.ednevnik.repositories.StudentRepository;
 
 @RestController
 @RequestMapping(value = "/api/v1/parents")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class ParentController {
 
 	@Autowired

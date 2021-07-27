@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.iktakademija.ednevnik.controllers.util.RESTError;
 import com.iktakademija.ednevnik.entities.SubjectEntity;
+import com.iktakademija.ednevnik.entities.dto.SubjectDTO;
 import com.iktakademija.ednevnik.repositories.SubjectRepository;
 
 @RestController
@@ -56,17 +57,17 @@ public class SubjectController {
 	
 	// dodaj novi predmet
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<?> createSubject(@RequestBody SubjectEntity subjectEntity,
+	public ResponseEntity<?> createSubject(@RequestBody SubjectDTO subjectDTO,
 			 BindingResult result) {
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 		}
 
 		SubjectEntity newSubject = new SubjectEntity();
-		newSubject.setNameOfSubject(subjectEntity.getNameOfSubject());
-		newSubject.setWeeklyHours(subjectEntity.getWeeklyHours());
-		newSubject.setSemester(subjectEntity.getSemester());
-		newSubject.setSubjectForYear(subjectEntity.getSubjectForYear());
+		newSubject.setNameOfSubject(subjectDTO.getNameOfSubject());
+		newSubject.setWeeklyHours(subjectDTO.getWeeklyHours());
+		newSubject.setSemester(subjectDTO.getSemester());
+		newSubject.setSubjectForYear(subjectDTO.getSubjectForYear());
 
 		subjectRepository.save(newSubject);
 		return new ResponseEntity<SubjectEntity>(newSubject, HttpStatus.CREATED);
@@ -75,7 +76,7 @@ public class SubjectController {
 	// izmeni predmet
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
 	public ResponseEntity<?> updateSubject(@PathVariable Integer id, 
-			@RequestBody SubjectEntity updatedSubject, BindingResult result) {
+			@RequestBody SubjectDTO subjectDTO, BindingResult result) {
 		
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
@@ -84,21 +85,21 @@ public class SubjectController {
 		if (subjectRepository.existsById(id)) {
 			SubjectEntity subjectEntity = subjectRepository.findById(id).get();
 
-			if (updatedSubject.getNameOfSubject() != null) {
-				subjectEntity.setNameOfSubject(updatedSubject.getNameOfSubject());
+			if (subjectDTO.getNameOfSubject() != null) {
+				subjectEntity.setNameOfSubject(subjectDTO.getNameOfSubject());
 			}
-			if (updatedSubject.getWeeklyHours() != null) {
-				subjectEntity.setWeeklyHours(updatedSubject.getWeeklyHours());
+			if (subjectDTO.getWeeklyHours() != null) {
+				subjectEntity.setWeeklyHours(subjectDTO.getWeeklyHours());
 			}
-			if (updatedSubject.getSemester() != null) {
-				subjectEntity.setSemester(updatedSubject.getSemester());
+			if (subjectDTO.getSemester() != null) {
+				subjectEntity.setSemester(subjectDTO.getSemester());
 			}
-			if (updatedSubject.getSubjectForYear() != null) {
-				subjectEntity.setSubjectForYear(updatedSubject.getSubjectForYear());
+			if (subjectDTO.getSubjectForYear() != null) {
+				subjectEntity.setSubjectForYear(subjectDTO.getSubjectForYear());
 			}
 			
-			subjectRepository.save(updatedSubject);
-			return new ResponseEntity<SubjectEntity>(updatedSubject, HttpStatus.OK);
+			subjectRepository.save(subjectEntity);
+			return new ResponseEntity<SubjectEntity>(subjectEntity, HttpStatus.OK);
 		}
 		return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + id + " not found"), HttpStatus.NOT_FOUND);
 	}
@@ -113,7 +114,5 @@ public class SubjectController {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + id + " not found"), HttpStatus.NOT_FOUND);
 		}
 	}
-	
-	// dodaj nastavnika za predmet
-	// obrisi nastavnika iz predmeta
+
 }

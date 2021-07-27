@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,16 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iktakademija.ednevnik.controllers.util.RESTError;
 import com.iktakademija.ednevnik.entities.ClassEntity;
 import com.iktakademija.ednevnik.entities.StudentEntity;
-import com.iktakademija.ednevnik.entities.SubjectEntity;
 import com.iktakademija.ednevnik.entities.TeacherEntity;
-import com.iktakademija.ednevnik.entities.TeacherSubjectEntity;
-import com.iktakademija.ednevnik.entities.TeacherSubjectStudentEntity;
+import com.iktakademija.ednevnik.entities.dto.ClassDTO;
 import com.iktakademija.ednevnik.entities.enums.EYear;
 import com.iktakademija.ednevnik.repositories.ClassRepository;
 import com.iktakademija.ednevnik.repositories.StudentRepository;
-import com.iktakademija.ednevnik.repositories.SubjectRepository;
 import com.iktakademija.ednevnik.repositories.TeacherRepository;
-import com.iktakademija.ednevnik.repositories.TeacherSubjectStudentRepository;
 
 @RestController
 @RequestMapping(value = "/api/v1/classes")
@@ -77,22 +71,21 @@ public class ClassController {
 
 	// dodaj novo odeljenje
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<?> createClass(@RequestBody ClassEntity classEntity, BindingResult result) {
+	public ResponseEntity<?> createClass(@RequestBody ClassDTO classDTO, BindingResult result) {
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 		}
 
 		ClassEntity newClass = new ClassEntity();
 
-		if (classRepository.existsByClassNumberAndYear(classEntity.getClassNumber(), classEntity.getYear())) {
+		if (classRepository.existsByClassNumberAndYear(classDTO.getClassNumber(), classDTO.getYear())) {
 			return new ResponseEntity<RESTError>(new RESTError(HttpStatus.BAD_REQUEST.value(),
-					"Class " + EYear.valueOf(classEntity.getYear().toString()) + " " + classEntity.getClassNumber()
+					"Class " + EYear.valueOf(classDTO.getYear().toString()) + " " + classDTO.getClassNumber()
 							+ " already exists."),
 					HttpStatus.NOT_FOUND);
 		} else {
-			newClass.setClassNumber(classEntity.getClassNumber());
-			newClass.setYear(EYear.valueOf(classEntity.getYear().toString()));
-			newClass.setHomeroomTeacher(classEntity.getHomeroomTeacher());
+			newClass.setClassNumber(classDTO.getClassNumber());
+			newClass.setYear(EYear.valueOf(classDTO.getYear().toString()));
 
 			classRepository.save(newClass);
 			return new ResponseEntity<ClassEntity>(newClass, HttpStatus.CREATED);
@@ -103,28 +96,27 @@ public class ClassController {
 	// izmeni odeljenje
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
 	public ResponseEntity<?> updateClass(@PathVariable Integer id, 
-			@RequestBody ClassEntity updatedClass, BindingResult result) {
+			@RequestBody ClassDTO classDTO, BindingResult result) {
 		
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 		}
-
 		if (classRepository.existsById(id)) {
 			ClassEntity classEntity = classRepository.findById(id).get();
 
-			if (classRepository.existsByClassNumberAndYear(updatedClass.getClassNumber(), updatedClass.getYear())) {
+			if (classRepository.existsByClassNumberAndYear(classDTO.getClassNumber(), classDTO.getYear())) {
 				return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.BAD_REQUEST.value(), "Class "
-						+ EYear.valueOf(updatedClass.getYear().toString()) + " " + updatedClass.getClassNumber() + " already exists."), HttpStatus.NOT_FOUND);
+						+ EYear.valueOf(classDTO.getYear().toString()) + " " + classDTO.getClassNumber() + " already exists."), HttpStatus.NOT_FOUND);
 			} else {
-				if (updatedClass.getClassNumber() != null) {
-					classEntity.setClassNumber(updatedClass.getClassNumber());
+				if (classDTO.getClassNumber() != null) {
+					classEntity.setClassNumber(classDTO.getClassNumber());
 				}
-				if (updatedClass.getYear() != null) {
-					classEntity.setYear(updatedClass.getYear());
+				if (classDTO.getYear() != null) {
+					classEntity.setYear(classDTO.getYear());
 				}
 				
-				classRepository.save(updatedClass);
-				return new ResponseEntity<ClassEntity>(updatedClass, HttpStatus.OK);
+				classRepository.save(classEntity);
+				return new ResponseEntity<ClassEntity>(classEntity, HttpStatus.OK);
 			}
 		}
 
@@ -135,6 +127,7 @@ public class ClassController {
 	// obrisi odeljenje
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
 	public ResponseEntity<?> deleteClass(@PathVariable Integer id) {
+		
 		if (classRepository.existsById(id)) {
 			classRepository.deleteById(id);
 			classRepository.save(classRepository.findById(id).get());
@@ -147,7 +140,8 @@ public class ClassController {
 	// dodaj ucenika u odeljenje
 	@RequestMapping(method = RequestMethod.PUT, value = "/{classId}/assignStudent/{studentId}")
 	public ResponseEntity<?> addStudentToClass(@PathVariable Integer classId, 
-			@PathVariable Integer studentId) {
+			@PathVariable Integer studentId) {		
+		
 		if (classRepository.existsById(classId) && studentRepository.existsById(studentId)) {
 			ClassEntity classs = classRepository.findById(classId).get();
 			StudentEntity student = studentRepository.findById(studentId).get();
@@ -171,6 +165,7 @@ public class ClassController {
 	@RequestMapping(method = RequestMethod.PUT, value = "/{classId}/removeStudent/{studentId}")
 	public ResponseEntity<?> removeStudentFromClass(@PathVariable Integer classId, 
 			@PathVariable Integer studentId) {
+		
 		if (classRepository.existsById(classId) && studentRepository.existsById(studentId)) {
 			ClassEntity classs = classRepository.findById(classId).get();
 			StudentEntity student = studentRepository.findById(studentId).get();
@@ -194,7 +189,8 @@ public class ClassController {
 	// dodaj odeljenskog
 	@RequestMapping(method = RequestMethod.PUT, value = "/{classId}/assignHomeroomTeacher/{teacherId}")
 	public ResponseEntity<?> assignHomeroomTeacher(@PathVariable Integer classId, 
-			@PathVariable Integer teacherId) {
+			@PathVariable Integer teacherId) {		
+		
 		if (classRepository.existsById(classId) && teacherRepository.existsById(teacherId)) {
 			ClassEntity classs = classRepository.findById(classId).get();
 			TeacherEntity teacher = teacherRepository.findById(teacherId).get();
@@ -215,7 +211,8 @@ public class ClassController {
 	// obrisi odeljenskog
 	@RequestMapping(method = RequestMethod.PUT, value = "/{classId}/removeHomeroomTeacher/{teacherId}")
 	public ResponseEntity<?> removeHomeroomTeacherFromClass(@PathVariable Integer classId, 
-			@PathVariable Integer teacherId) {
+			@PathVariable Integer teacherId) {		
+		
 		if (classRepository.existsById(classId) && teacherRepository.existsById(teacherId)) {
 			ClassEntity classs = classRepository.findById(classId).get();
 			TeacherEntity teacher = teacherRepository.findById(teacherId).get();

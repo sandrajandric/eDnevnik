@@ -1,9 +1,7 @@
 package com.iktakademija.ednevnik.repositories;
 
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.iktakademija.ednevnik.entities.StudentEntity;
 

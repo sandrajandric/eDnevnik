@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.iktakademija.ednevnik.controllers.util.RESTError;
 import com.iktakademija.ednevnik.entities.ParentEntity;
+import com.iktakademija.ednevnik.entities.RoleEntity;
 import com.iktakademija.ednevnik.entities.StudentEntity;
 import com.iktakademija.ednevnik.entities.dto.UserDTO;
 import com.iktakademija.ednevnik.entities.dto.UserDTOPut;
 import com.iktakademija.ednevnik.repositories.ParentRepository;
+import com.iktakademija.ednevnik.repositories.RoleRepository;
 import com.iktakademija.ednevnik.repositories.StudentRepository;
 
 @RestController
@@ -29,11 +33,16 @@ import com.iktakademija.ednevnik.repositories.StudentRepository;
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 public class StudentController {
 
+	private final Logger logger = (Logger) LoggerFactory.getLogger(this.getClass());
+
 	@Autowired
 	private StudentRepository studentRepository;
 	
 	@Autowired
 	private ParentRepository parentRepository;
+	
+	@Autowired
+	private RoleRepository roleRepository;
 	
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage)
@@ -46,6 +55,7 @@ public class StudentController {
 		List<StudentEntity> students = new ArrayList<>();
 		students = (List<StudentEntity>) studentRepository.findAll();
 		if (!students.isEmpty()) {
+			logger.info("Viewed all students.");
 			return new ResponseEntity<List<StudentEntity>>(students, HttpStatus.OK);
 		} else {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Students not found"), HttpStatus.NOT_FOUND);
@@ -57,6 +67,7 @@ public class StudentController {
 	public ResponseEntity<?> getStudentById(@PathVariable Integer id) {
 		if (studentRepository.existsById(id)) {
 			StudentEntity studentEntity = studentRepository.findById(id).get();
+			logger.info("Viewed student with id number " + id);
 			return new ResponseEntity<StudentEntity>(studentEntity, HttpStatus.OK);
 		} else {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Student with id number " + id + " not found"), HttpStatus.NOT_FOUND);
@@ -71,14 +82,17 @@ public class StudentController {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 		}
 
+		RoleEntity role = roleRepository.findById(2).get();
 		StudentEntity newStudent = new StudentEntity();
 		newStudent.setName(userDTO.getName());
 		newStudent.setSurname(userDTO.getSurname());
 		newStudent.setEmail(userDTO.getEmail());
 		newStudent.setPassword(userDTO.getPassword());
 		newStudent.setUsername(userDTO.getUsername());
+		newStudent.setRole(role);
 
 		studentRepository.save(newStudent);
+		logger.info("Created student " + newStudent.toString());
 		return new ResponseEntity<StudentEntity>(newStudent, HttpStatus.CREATED);
 	}
 	
@@ -111,6 +125,7 @@ public class StudentController {
 			}
 			
 			studentRepository.save(studentEntity);
+			logger.info("Updated student " + studentEntity.toString());
 			return new ResponseEntity<StudentEntity>(studentEntity, HttpStatus.OK);
 		}
 		else {
@@ -123,6 +138,7 @@ public class StudentController {
 	public ResponseEntity<?> deleteStudent(@PathVariable Integer id) {
 		if (studentRepository.existsById(id)) {
 			studentRepository.deleteById(id);
+			logger.info("Deleted student with id number " + id);
 			return new ResponseEntity<StudentEntity>(HttpStatus.OK);
 		} else {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Student with id number " + id + " not found"), HttpStatus.NOT_FOUND);
@@ -147,6 +163,7 @@ public class StudentController {
 				}
 				parentRepository.save(parent);
 				studentRepository.save(student);
+				logger.info("Student with id number " + studentId + " added to parent with id number " + parentId);
 				return new ResponseEntity<ParentEntity>(parent, HttpStatus.OK);
 			} else {
 				if (!parentRepository.existsById(parentId)) {
@@ -157,7 +174,7 @@ public class StudentController {
 			}
 		}
 		
-		// obrisi ucenika
+		// obrisi roditelja
 		@RequestMapping(method = RequestMethod.PUT, value = "/{studentId}/removeParentFromStudent/{parentId}")
 		public ResponseEntity<?> removeParentFromStudent(@PathVariable Integer studentId,
 				@PathVariable Integer parentId) {
@@ -165,6 +182,7 @@ public class StudentController {
 				StudentEntity student = studentRepository.findById(studentId).get();
 				student.setParent(null);
 				studentRepository.save(student);
+				logger.info("Parent with id number " + parentId + " removed from student with id number " + studentId);
 				return new ResponseEntity<StudentEntity>(student, HttpStatus.OK);
 			} else {
 				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(),

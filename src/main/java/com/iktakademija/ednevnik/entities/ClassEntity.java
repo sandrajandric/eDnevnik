@@ -105,5 +105,8 @@ public class ClassEntity {
 		this.homeroomTeacher = homeroomTeacher;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "Year: " + getYear() + ", ClassNumber: " + getClassNumber();
+	}
 }

@@ -37,6 +37,13 @@ public class RoleEntity {
 		// TODO Auto-generated constructor stub
 	}
 
+	public RoleEntity(Integer id, String name, List<UserEntity> users) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.users = users;
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -60,5 +67,7 @@ public class RoleEntity {
 	public void setUsers(List<UserEntity> users) {
 		this.users = users;
 	}
+
+	
 	
 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,8 @@ import com.iktakademija.ednevnik.repositories.SubjectRepository;
 @RequestMapping(value = "/api/v1/subjects")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 public class SubjectController {
+	
+	private final Logger logger = (Logger) LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private SubjectRepository subjectRepository;
@@ -41,6 +45,7 @@ public class SubjectController {
 		List<SubjectEntity> subjects = new ArrayList<>();
 		subjects = (List<SubjectEntity>) subjectRepository.findAll();
 		if (!subjects.isEmpty()) {
+			logger.info("Viewed all subjects.");
 			return new ResponseEntity<List<SubjectEntity>>(subjects, HttpStatus.OK);
 		} else {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Subjects not found"), HttpStatus.NOT_FOUND);
@@ -52,6 +57,7 @@ public class SubjectController {
 	public ResponseEntity<?> getSubjectById(@PathVariable Integer id) {
 		if (subjectRepository.existsById(id)) {
 			SubjectEntity subjectEntity = subjectRepository.findById(id).get();
+			logger.info("Viewed subject with id number " + id);
 			return new ResponseEntity<SubjectEntity>(subjectEntity, HttpStatus.OK);
 		} else {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + id + " not found"), HttpStatus.NOT_FOUND);
@@ -73,6 +79,7 @@ public class SubjectController {
 		newSubject.setSubjectForYear(subjectDTO.getSubjectForYear());
 
 		subjectRepository.save(newSubject);
+		logger.info("Created subject " + newSubject.toString());
 		return new ResponseEntity<SubjectEntity>(newSubject, HttpStatus.CREATED);
 	}
 	
@@ -102,6 +109,7 @@ public class SubjectController {
 			}
 			
 			subjectRepository.save(subjectEntity);
+			logger.info("Updated subject with id number " + id);
 			return new ResponseEntity<SubjectEntity>(subjectEntity, HttpStatus.OK);
 		}
 		return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + id + " not found"), HttpStatus.NOT_FOUND);
@@ -112,6 +120,7 @@ public class SubjectController {
 	public ResponseEntity<?> deleteSubject(@PathVariable Integer id) {
 		if (subjectRepository.existsById(id)) {
 			subjectRepository.deleteById(id);
+			logger.info("Deleted subject with id number " + id);
 			return new ResponseEntity<SubjectEntity>(HttpStatus.OK);
 		} else {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + id + " not found"), HttpStatus.NOT_FOUND);

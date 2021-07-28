@@ -129,5 +129,8 @@ public class SubjectEntity {
 		this.subjectForYear = subjectForYear;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "NameOfSubject: " + getNameOfSubject() + ", Year: " + getSubjectForYear();
+	}
 }

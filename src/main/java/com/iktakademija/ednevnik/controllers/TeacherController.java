@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,12 +19,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iktakademija.ednevnik.controllers.util.RESTError;
-import com.iktakademija.ednevnik.entities.ClassEntity;
+import com.iktakademija.ednevnik.entities.RoleEntity;
 import com.iktakademija.ednevnik.entities.SubjectEntity;
 import com.iktakademija.ednevnik.entities.TeacherEntity;
 import com.iktakademija.ednevnik.entities.TeacherSubjectEntity;
 import com.iktakademija.ednevnik.entities.dto.UserDTO;
 import com.iktakademija.ednevnik.entities.dto.UserDTOPut;
+import com.iktakademija.ednevnik.repositories.RoleRepository;
 import com.iktakademija.ednevnik.repositories.SubjectRepository;
 import com.iktakademija.ednevnik.repositories.TeacherRepository;
 import com.iktakademija.ednevnik.repositories.TeacherSubjectRepository;
@@ -32,6 +34,8 @@ import com.iktakademija.ednevnik.repositories.TeacherSubjectRepository;
 @RequestMapping(value = "/api/v1/teachers")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 public class TeacherController {
+	
+	private final Logger logger = (Logger) LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private TeacherRepository teacherRepository;
@@ -41,6 +45,9 @@ public class TeacherController {
 
 	@Autowired
 	private TeacherSubjectRepository teacherSubjectRepository;
+	
+	@Autowired
+	private RoleRepository roleRepository;
 
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));
@@ -52,6 +59,7 @@ public class TeacherController {
 		List<TeacherEntity> teachers = new ArrayList<>();
 		teachers = (List<TeacherEntity>) teacherRepository.findAll();
 		if (!teachers.isEmpty()) {
+			logger.info("Viewed all teachers.");
 			return new ResponseEntity<List<TeacherEntity>>(teachers, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Teachers not found"),
@@ -64,6 +72,7 @@ public class TeacherController {
 	public ResponseEntity<?> getTeacherById(@PathVariable Integer id) {
 		if (teacherRepository.existsById(id)) {
 			TeacherEntity teacherEntity = teacherRepository.findById(id).get();
+			logger.info("Viewed teacher with id number " + id);
 			return new ResponseEntity<TeacherEntity>(teacherEntity, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<RESTError>(
@@ -78,15 +87,18 @@ public class TeacherController {
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 		}
-
+		
+		RoleEntity role = roleRepository.findById(1).get();
 		TeacherEntity newTeacher = new TeacherEntity();
 		newTeacher.setName(userDTO.getName());
 		newTeacher.setSurname(userDTO.getSurname());
 		newTeacher.setEmail(userDTO.getEmail());
 		newTeacher.setPassword(userDTO.getPassword());
 		newTeacher.setUsername(userDTO.getUsername());
+		newTeacher.setRole(role);
 
 		teacherRepository.save(newTeacher);
+		logger.info("Created teacher " + newTeacher.toString());
 		return new ResponseEntity<TeacherEntity>(newTeacher, HttpStatus.CREATED);
 	}
 
@@ -119,6 +131,7 @@ public class TeacherController {
 			}
 
 			teacherRepository.save(teacherEntity);
+			logger.info("Updated teacher " + teacherEntity.toString());
 			return new ResponseEntity<TeacherEntity>(teacherEntity, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<RESTError>(
@@ -132,6 +145,7 @@ public class TeacherController {
 	public ResponseEntity<?> deleteTeacher(@PathVariable Integer id) {
 		if (teacherRepository.existsById(id)) {
 			teacherRepository.deleteById(id);
+			logger.info("Deleted teacher with id number " + id);
 			return new ResponseEntity<TeacherEntity>(HttpStatus.OK);
 		} else {
 			return new ResponseEntity<RESTError>(
@@ -160,6 +174,7 @@ public class TeacherController {
 			}
 			
 			teacherSubjectRepository.save(teacherSubject);
+			logger.info("Subject with id number " + subjectId + " added to teacher with id number " + teacherId);
 			return new ResponseEntity<TeacherSubjectEntity>(teacherSubject, HttpStatus.OK);
 		} else {
 			if (!subjectRepository.existsById(subjectId)) {
@@ -178,6 +193,7 @@ public class TeacherController {
 			@PathVariable Integer subjectId) {
 		if (teacherSubjectRepository.existsSubjectIdAndTeacherId(subjectId, teacherId) >= 1) {
 			teacherSubjectRepository.removeSubjectFromTeacher(subjectId, teacherId);
+			logger.info("Subject with id number " + subjectId + " removed from teacher with id number " + teacherId);
 			return new ResponseEntity<TeacherSubjectEntity>( HttpStatus.OK);
 		} else {
 			return new ResponseEntity<RESTError>(

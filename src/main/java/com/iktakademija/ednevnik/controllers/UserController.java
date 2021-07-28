@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -27,19 +26,17 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @RestController
-@PreAuthorize("hasRole('ROLE_ADMIN')")
-@RequestMapping(value = "/api/v1/users")
 public class UserController {
 
 	@Value("${spring.security.secret-key}")
 	private String secretKey;
 
 	@Value("${spring.security.token-duration}")
-	private Integer tokenDuration;
+	private Long tokenDuration;
 
 	@Autowired
 	private UserRepository userRepository;
-
+	
 	private String getJWTToken(UserEntity userEntity) {
 		List<GrantedAuthority> grantedAuthorities = AuthorityUtils
 				.commaSeparatedStringToAuthorityList(userEntity.getRole().getName());
@@ -67,7 +64,8 @@ public class UserController {
 		return new ResponseEntity<>("Wrong credentials", HttpStatus.UNAUTHORIZED);
 	}
 
-	@RequestMapping(path = "", method = RequestMethod.GET)
+	@RequestMapping(path = "/api/v1/users", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<?> listUsers() {
 		return new ResponseEntity<List<UserEntity>>((List<UserEntity>) userRepository.findAll(), HttpStatus.OK);
 	}

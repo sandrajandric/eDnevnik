@@ -6,10 +6,11 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -35,6 +36,8 @@ import com.iktakademija.ednevnik.repositories.TeacherRepository;
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 public class ClassController {
 
+	private final Logger logger = (Logger) LoggerFactory.getLogger(this.getClass());
+	
 	@Autowired
 	private ClassRepository classRepository;
 
@@ -55,6 +58,7 @@ public class ClassController {
 		List<ClassEntity> classes = new ArrayList<>();
 		classes = (List<ClassEntity>) classRepository.findAll();
 		if (!classes.isEmpty()) {
+			logger.info("Viewed all classes.");
 			return new ResponseEntity<List<ClassEntity>>(classes, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Classes not found"),
@@ -67,6 +71,7 @@ public class ClassController {
 	public ResponseEntity<?> getClassById(@PathVariable Integer id) {
 		if (classRepository.existsById(id)) {
 			ClassEntity classEntity = classRepository.findById(id).get();
+			logger.info("Viewed class with id number " + id);
 			return new ResponseEntity<ClassEntity>(classEntity, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<RESTError>(
@@ -94,6 +99,7 @@ public class ClassController {
 			newClass.setYear(EYear.valueOf(classDTO.getYear().toString()));
 
 			classRepository.save(newClass);
+			logger.info("Created class " + newClass.toString());
 			return new ResponseEntity<ClassEntity>(newClass, HttpStatus.CREATED);
 		}
 
@@ -122,6 +128,7 @@ public class ClassController {
 				}
 				
 				classRepository.save(classEntity);
+				logger.info("Updated class with id number " + id);
 				return new ResponseEntity<ClassEntity>(classEntity, HttpStatus.OK);
 			}
 		}
@@ -137,6 +144,7 @@ public class ClassController {
 		if (classRepository.existsById(id)) {
 			classRepository.deleteById(id);
 			classRepository.save(classRepository.findById(id).get());
+			logger.info("Deleted class with id number " + id);
 			return new ResponseEntity<ClassEntity>(HttpStatus.OK);
 		} else {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + id + " not found"), HttpStatus.NOT_FOUND);
@@ -157,6 +165,7 @@ public class ClassController {
 			classs.setStudents(students);
 			classRepository.save(classs);
 			studentRepository.save(student);
+			logger.info("Student with id number " + studentId + " added to class with id number " + classId);
 			return new ResponseEntity<ClassEntity>(classs, HttpStatus.OK);
 		} else {
 			if (!classRepository.existsById(classId)) {
@@ -182,6 +191,7 @@ public class ClassController {
 			classs.setStudents(studentsNew);
 			classRepository.save(classs);
 			studentRepository.save(student);
+			logger.info("Student with id number " + studentId + " removed from class with id number " + classId);
 			return new ResponseEntity<ClassEntity>(classs, HttpStatus.OK);
 		} else {
 			if (!classRepository.existsById(classId)) {
@@ -204,6 +214,7 @@ public class ClassController {
 			teacher.setInChargeOfClass(classs);
 			classRepository.save(classs);
 			teacherRepository.save(teacher);
+			logger.info("Teacher with id number " + teacherId + " added as homeroom teacher to class with id number " + classId);
 			return new ResponseEntity<ClassEntity>(classs, HttpStatus.OK);
 		} else {
 			if (!classRepository.existsById(classId)) {
@@ -226,6 +237,7 @@ public class ClassController {
 			classs.setHomeroomTeacher(null);
 			classRepository.save(classs);
 			teacherRepository.save(teacher);
+			logger.info("Teacher with id number " + teacherId + " removed as homeroom teacher for class with id number " + classId);
 			return new ResponseEntity<ClassEntity>(classs, HttpStatus.OK);
 		} else {
 			if (!classRepository.existsById(classId)) {

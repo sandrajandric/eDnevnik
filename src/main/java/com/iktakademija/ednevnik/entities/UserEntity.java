@@ -130,5 +130,9 @@ public class UserEntity {
 		this.role = role;
 	}
 
-	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return "Role: " + getRole()	+ ", Name: " + getName() + ", Surname: " + getSurname();
+	}
 }

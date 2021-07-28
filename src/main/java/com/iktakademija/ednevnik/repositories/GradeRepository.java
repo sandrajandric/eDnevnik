@@ -6,4 +6,5 @@ import com.iktakademija.ednevnik.entities.GradeEntity;
 
 public interface GradeRepository extends CrudRepository<GradeEntity, Integer> {
 
+	
 }

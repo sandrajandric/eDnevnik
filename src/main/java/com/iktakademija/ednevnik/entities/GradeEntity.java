@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
 
@@ -33,23 +34,17 @@ public class GradeEntity {
 	private Integer id;
 
 	@JsonView(Views.Private.class)
-	@NotBlank(message = "Grade type must not be null. Accepted values are: TEST, ORAL, CLASS_ACTIVITY")
+	@NotNull(message = "Grade type must not be null. Accepted values are: TEST, ORAL, CLASS_ACTIVITY")
 	private EGradeType gradeType;
 	
 	@JsonView(Views.Private.class)
 	@Range(min = 1, max = 5)
-	@NotBlank(message = "Grade must not be left blank. Accepted values are between {min} and {max}.")
+	@NotNull(message = "Grade must not be left blank. Accepted values are between {min} and {max}.")
 	private Integer grade;
 	
 	@JsonView(Views.Private.class)
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private LocalDate date;
-	
-	@JsonView(Views.Private.class)
-	@JsonBackReference(value = "gtsp")
-	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
-	@JoinColumn(name = "teacher_subject_pupil")
-	private TeacherSubjectStudentEntity teacherSubjectPupil;
 	
 	@JsonView(Views.Admin.class)
 	@Version
@@ -64,13 +59,9 @@ public class GradeEntity {
 		return id;
 	}
 
-
-
 	public void setId(Integer id) {
 		this.id = id;
 	}
-
-
 
 	public EGradeType getGradeType() {
 		return gradeType;
@@ -96,13 +87,9 @@ public class GradeEntity {
 		this.date = date;
 	}
 
-	public TeacherSubjectStudentEntity getTeacherSubjectPupil() {
-		return teacherSubjectPupil;
+	@Override
+	public String toString() {
+		return "GradeType: " + getGradeType() + ", Grade: " + getGrade() + ", Date: " + getDate();
 	}
-
-	public void setTeacherSubjectPupil(TeacherSubjectStudentEntity teacherSubjectPupil) {
-		this.teacherSubjectPupil = teacherSubjectPupil;
-	}
-	
 	
 }

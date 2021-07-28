@@ -35,6 +35,12 @@ public class TeacherSubjectEntity {
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "subject")
 	private SubjectEntity subject;
+	
+	@JsonView(Views.Private.class)
+	@JsonBackReference(value = "ts")
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	@JoinColumn(name = "student")
+	private StudentEntity student;
 
 	public TeacherSubjectEntity() {
 		super();
@@ -68,6 +74,16 @@ public class TeacherSubjectEntity {
 
 	public void setSubject(SubjectEntity subject) {
 		this.subject = subject;
+	}
+
+
+	public StudentEntity getStudent() {
+		return student;
+	}
+
+
+	public void setStudent(StudentEntity student) {
+		this.student = student;
 	}
 	
 	

@@ -68,7 +68,7 @@ public class StudentEntity extends UserEntity {
 	public void setListens(List<TeacherSubjectStudentEntity> listens) {
 		this.listens = listens;
 	}
-	
+
 	
 	
 }

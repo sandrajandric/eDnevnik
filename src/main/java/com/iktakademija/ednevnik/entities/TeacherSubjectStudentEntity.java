@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.iktakademija.ednevnik.security.Views;
 
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 @Entity
 @Table(name = "teacher_subject_student")
 public class TeacherSubjectStudentEntity {
@@ -28,13 +28,13 @@ public class TeacherSubjectStudentEntity {
 	@Id
 	@GeneratedValue
 	private Integer id;
-	
+
 	@JsonView(Views.Private.class)
 	@JsonBackReference(value = "tspp")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "student")
 	private StudentEntity student;
-	
+
 	@JsonView(Views.Private.class)
 	@JsonManagedReference(value = "gtsp")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
@@ -50,11 +50,9 @@ public class TeacherSubjectStudentEntity {
 		return id;
 	}
 
-
 	public void setId(Integer id) {
 		this.id = id;
 	}
-
 
 	public StudentEntity getPupil() {
 		return student;
@@ -71,7 +69,5 @@ public class TeacherSubjectStudentEntity {
 	public void setHasGrades(List<GradeEntity> hasGrades) {
 		this.hasGrades = hasGrades;
 	}
-	
-	
-	
+
 }

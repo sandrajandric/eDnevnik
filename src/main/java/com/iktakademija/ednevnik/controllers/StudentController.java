@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,10 +27,11 @@ import com.iktakademija.ednevnik.entities.dto.UserDTOPut;
 import com.iktakademija.ednevnik.repositories.ParentRepository;
 import com.iktakademija.ednevnik.repositories.RoleRepository;
 import com.iktakademija.ednevnik.repositories.StudentRepository;
+import com.iktakademija.ednevnik.util.Encryption;
 
 @RestController
 @RequestMapping(value = "/api/v1/students")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@Secured("ROLE_ADMIN")
 public class StudentController {
 
 	private final Logger logger = (Logger) LoggerFactory.getLogger(this.getClass());
@@ -43,6 +44,8 @@ public class StudentController {
 	
 	@Autowired
 	private RoleRepository roleRepository;
+	
+	private Encryption encryption;
 	
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage)
@@ -87,7 +90,7 @@ public class StudentController {
 		newStudent.setName(userDTO.getName());
 		newStudent.setSurname(userDTO.getSurname());
 		newStudent.setEmail(userDTO.getEmail());
-		newStudent.setPassword(userDTO.getPassword());
+		newStudent.setPassword(encryption.getPassEncoded(userDTO.getPassword()));
 		newStudent.setUsername(userDTO.getUsername());
 		newStudent.setRole(role);
 
@@ -118,7 +121,7 @@ public class StudentController {
 				studentEntity.setEmail(userDTO.getEmail());
 			}
 			if (userDTO.getPassword() != null) {
-				studentEntity.setPassword(userDTO.getPassword());
+				studentEntity.setPassword(encryption.getPassEncoded(userDTO.getPassword()));
 			}
 			if (userDTO.getUsername() != null) {
 				studentEntity.setUsername(userDTO.getUsername());

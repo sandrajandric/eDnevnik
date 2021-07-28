@@ -8,13 +8,9 @@ public class Encryption {
 		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 		return bCryptPasswordEncoder.encode(pass);
 	}
-
-	public static boolean validatePassword(String pass, String encodedPass) {
-		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-		return bCryptPasswordEncoder.matches(pass, encodedPass);
-	}
-
+	
 	public static void main(String[] args) {
-		System.out.println(getPassEncoded("AadmiN2331!!"));
+		System.out.println(getPassEncoded("Admin123"));
 	}
+	
 }

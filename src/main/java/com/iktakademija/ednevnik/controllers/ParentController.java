@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,10 +27,11 @@ import com.iktakademija.ednevnik.entities.dto.UserDTO;
 import com.iktakademija.ednevnik.entities.dto.UserDTOPut;
 import com.iktakademija.ednevnik.repositories.ParentRepository;
 import com.iktakademija.ednevnik.repositories.RoleRepository;
+import com.iktakademija.ednevnik.util.Encryption;
 
 @RestController
 @RequestMapping(value = "/api/v1/parents")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@Secured("ROLE_ADMIN")
 public class ParentController {
 	
 	private final Logger logger = (Logger) LoggerFactory.getLogger(this.getClass());
@@ -40,6 +41,8 @@ public class ParentController {
 	
 	@Autowired
 	private RoleRepository roleRepository;
+	
+	private Encryption encryption;
 	
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage)
@@ -84,7 +87,7 @@ public class ParentController {
 		newParent.setName(userDTO.getName());
 		newParent.setSurname(userDTO.getSurname());
 		newParent.setEmail(userDTO.getEmail());
-		newParent.setPassword(userDTO.getPassword());
+		newParent.setPassword(encryption.getPassEncoded(userDTO.getPassword()));
 		newParent.setUsername(userDTO.getUsername());
 		newParent.setRole(role);
 		
@@ -115,7 +118,7 @@ public class ParentController {
 				parentEntity.setEmail(userDTO.getEmail());
 			}
 			if (userDTO.getPassword() != null) {
-				parentEntity.setPassword(userDTO.getPassword());
+				parentEntity.setPassword(encryption.getPassEncoded(userDTO.getPassword()));
 			}
 			if (userDTO.getUsername() != null) {
 				parentEntity.setUsername(userDTO.getUsername());

@@ -56,7 +56,6 @@ public class UserEntity {
 	@JsonIgnore
 	@Column(nullable = false)
 	@NotBlank(message = "Password must not be left blank.")
-	@Size(min = 8, max = 32, message = "Password must be between {min} and {max} characters long.")
 	private String password;
 	
 	@JsonView(Views.Admin.class)

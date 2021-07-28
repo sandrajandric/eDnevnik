@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,10 +29,11 @@ import com.iktakademija.ednevnik.repositories.RoleRepository;
 import com.iktakademija.ednevnik.repositories.SubjectRepository;
 import com.iktakademija.ednevnik.repositories.TeacherRepository;
 import com.iktakademija.ednevnik.repositories.TeacherSubjectRepository;
+import com.iktakademija.ednevnik.util.Encryption;
 
 @RestController
 @RequestMapping(value = "/api/v1/teachers")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@Secured("ROLE_ADMIN")
 public class TeacherController {
 	
 	private final Logger logger = (Logger) LoggerFactory.getLogger(this.getClass());
@@ -48,6 +49,8 @@ public class TeacherController {
 	
 	@Autowired
 	private RoleRepository roleRepository;
+	
+	private Encryption encryption;
 
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));
@@ -93,7 +96,7 @@ public class TeacherController {
 		newTeacher.setName(userDTO.getName());
 		newTeacher.setSurname(userDTO.getSurname());
 		newTeacher.setEmail(userDTO.getEmail());
-		newTeacher.setPassword(userDTO.getPassword());
+		newTeacher.setPassword(encryption.getPassEncoded(userDTO.getPassword()));
 		newTeacher.setUsername(userDTO.getUsername());
 		newTeacher.setRole(role);
 
@@ -124,7 +127,7 @@ public class TeacherController {
 				teacherEntity.setEmail(userDTO.getEmail());
 			}
 			if (userDTO.getPassword() != null) {
-				teacherEntity.setPassword(userDTO.getPassword());
+				teacherEntity.setPassword(encryption.getPassEncoded(userDTO.getPassword()));
 			}
 			if (userDTO.getUsername() != null) {
 				teacherEntity.setUsername(userDTO.getUsername());

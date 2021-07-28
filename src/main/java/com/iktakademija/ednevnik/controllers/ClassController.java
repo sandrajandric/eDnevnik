@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +33,7 @@ import com.iktakademija.ednevnik.repositories.TeacherRepository;
 
 @RestController
 @RequestMapping(value = "/api/v1/classes")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@Secured("ROLE_ADMIN")
 public class ClassController {
 
 	private final Logger logger = (Logger) LoggerFactory.getLogger(this.getClass());
@@ -143,9 +143,8 @@ public class ClassController {
 		
 		if (classRepository.existsById(id)) {
 			classRepository.deleteById(id);
-			classRepository.save(classRepository.findById(id).get());
 			logger.info("Deleted class with id number " + id);
-			return new ResponseEntity<ClassEntity>(HttpStatus.OK);
+			return new ResponseEntity<HttpStatus>(HttpStatus.OK);
 		} else {
 			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + id + " not found"), HttpStatus.NOT_FOUND);
 		}

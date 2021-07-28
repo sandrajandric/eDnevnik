@@ -15,7 +15,6 @@ public class UserDTOPut {
 	@Size(min = 5, max = 20, message = "Username must be between {min} and {max} characters long.")
 	private String username;
 	
-	@Size(min = 8, max = 32, message = "Password must be between {min} and {max} characters long.")
 	private String password;
 
 	public UserDTOPut() {

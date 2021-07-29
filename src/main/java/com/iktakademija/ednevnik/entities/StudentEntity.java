@@ -39,10 +39,16 @@ public class StudentEntity extends UserEntity {
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "student")
 	private List<TeacherSubjectStudentEntity> listens = new ArrayList<>();
 
-
 	public StudentEntity() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+
+	public StudentEntity(ParentEntity parent, ClassEntity classs, List<TeacherSubjectStudentEntity> listens) {
+		super();
+		this.parent = parent;
+		this.classs = classs;
+		this.listens = listens;
 	}
 
 	public ParentEntity getParent() {
@@ -68,7 +74,6 @@ public class StudentEntity extends UserEntity {
 	public void setListens(List<TeacherSubjectStudentEntity> listens) {
 		this.listens = listens;
 	}
-
 	
 	
 }

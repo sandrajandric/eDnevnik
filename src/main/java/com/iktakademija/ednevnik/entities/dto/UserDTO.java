@@ -16,7 +16,7 @@ public class UserDTO {
 	private String email;
 	
 	@NotBlank(message = "Username must not be left blank.")
-	@Size(min = 5, max = 20, message = "Username must be between {min} and {max} characters long.")
+	@Size(min = 5, max = 600, message = "Username must be between {min} and {max} characters long.")
 	private String username;
 	
 	@NotBlank(message = "Password must not be left blank.")

@@ -12,7 +12,7 @@ public class UserDTOPut {
 	@Email(message = "Email is not valid.")
 	private String email;
 	
-	@Size(min = 5, max = 20, message = "Username must be between {min} and {max} characters long.")
+	@Size(min = 5, max = 600, message = "Username must be between {min} and {max} characters long.")
 	private String username;
 	
 	private String password;

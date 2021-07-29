@@ -37,12 +37,12 @@ public class TeacherSubjectStudentEntity {
 
 	@JsonBackReference(value = "tse")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
-	@JoinColumn(name = "teacher_subject")
+	@JoinColumn(name = "teacherSubject")
 	private TeacherSubjectEntity teacherSubject;
 	
 	@JsonView(Views.Private.class)
 	@JsonManagedReference(value = "gtsp")
-	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "teacherSubjectStudent")
 	private List<GradeEntity> grades = new ArrayList<>();
 
 	public TeacherSubjectStudentEntity() {

@@ -43,7 +43,7 @@ public class TeacherSubjectEntity {
 	private SubjectEntity subject;
 	
 	@JsonManagedReference(value = "tse")
-	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "teacherSubject")
 	private List<TeacherSubjectStudentEntity> teacherSubjectStudent = new ArrayList<>();
 
 	public TeacherSubjectEntity() {

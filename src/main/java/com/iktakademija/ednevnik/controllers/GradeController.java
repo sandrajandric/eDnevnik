@@ -26,6 +26,7 @@ import com.iktakademija.ednevnik.entities.ClassEntity;
 import com.iktakademija.ednevnik.entities.GradeEntity;
 import com.iktakademija.ednevnik.entities.StudentEntity;
 import com.iktakademija.ednevnik.entities.SubjectEntity;
+import com.iktakademija.ednevnik.entities.TeacherSubjectEntity;
 import com.iktakademija.ednevnik.entities.TeacherSubjectStudentEntity;
 import com.iktakademija.ednevnik.entities.dto.ClassDTO;
 import com.iktakademija.ednevnik.entities.dto.GradeDTO;
@@ -110,6 +111,7 @@ public class GradeController {
 		GradeEntity newGrade = new GradeEntity();
 		SubjectEntity subject = subjectRepository.findById(subjectId).get();
 		StudentEntity student = studentRepository.findById(studentId).get();
+		TeacherSubjectEntity teacherSubject = teacherSubjectRepository.findBySubjectIdAndTeacherId(subjectId, teacherId);
 		TeacherSubjectStudentEntity tsse = new TeacherSubjectStudentEntity();
 
 		if (studentRepository.existsById(studentId)) {
@@ -117,12 +119,15 @@ public class GradeController {
 				if (subjectRepository.existsById(subjectId)) {
 					if (teacherSubjectRepository.existsSubjectIdAndTeacherId(subjectId, teacherId) >= 1) {
 						if (subject.getSubjectForYear().equals(student.getClasss().getYear())) {
+							tsse.setStudent(student);
+							tsse.setTeacherSubject(teacherSubject);
 							newGrade.setGrade(gradeDTO.getGrade());
 							newGrade.setGradeType(gradeDTO.getGradeType());
 							newGrade.setDate(LocalDate.now());
 							newGrade.setTeacherSubjectStudent(tsse);
-							gradeRepository.save(newGrade);
 							
+							teacherSubjectStudentRepository.save(tsse);
+							gradeRepository.save(newGrade);
 							logger.info("Created grade " + newGrade.toString());
 							
 							if (tsse.getStudent().getParent().getEmail() != null) {

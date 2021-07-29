@@ -47,7 +47,7 @@ public class GradeEntity {
 	
 	@JsonBackReference(value = "gtsp")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
-	@JoinColumn(name = "teacher_subject_student")
+	@JoinColumn(name = "teacherSubjectStudent")
 	private TeacherSubjectStudentEntity teacherSubjectStudent;
 	
 	@JsonView(Views.Admin.class)

@@ -19,7 +19,7 @@ import com.iktakademija.ednevnik.security.Views;
 
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
-@Table(name = "pupil")
+@Table(name = "student")
 public class StudentEntity extends UserEntity {
 
 	@JsonView(Views.Private.class)

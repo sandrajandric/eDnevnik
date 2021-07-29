@@ -31,6 +31,7 @@ import com.iktakademija.ednevnik.entities.StudentEntity;
 import com.iktakademija.ednevnik.entities.SubjectEntity;
 import com.iktakademija.ednevnik.entities.TeacherSubjectEntity;
 import com.iktakademija.ednevnik.entities.TeacherSubjectStudentEntity;
+import com.iktakademija.ednevnik.entities.UserEntity;
 import com.iktakademija.ednevnik.entities.dto.GradeDTO;
 import com.iktakademija.ednevnik.repositories.GradeRepository;
 import com.iktakademija.ednevnik.repositories.StudentRepository;
@@ -38,8 +39,10 @@ import com.iktakademija.ednevnik.repositories.SubjectRepository;
 import com.iktakademija.ednevnik.repositories.TeacherRepository;
 import com.iktakademija.ednevnik.repositories.TeacherSubjectRepository;
 import com.iktakademija.ednevnik.repositories.TeacherSubjectStudentRepository;
+import com.iktakademija.ednevnik.repositories.UserRepository;
 import com.iktakademija.ednevnik.services.EmailService;
 import com.iktakademija.ednevnik.services.GradeService;
+import com.iktakademija.ednevnik.services.UserService;
 import com.iktakademija.ednevnik.services.dto.EmailObject;
 
 @RestController
@@ -66,12 +69,18 @@ public class GradeController {
 
 	@Autowired
 	private TeacherSubjectStudentRepository teacherSubjectStudentRepository;
+	
+	@Autowired
+	private UserRepository userRepository;
 
 	@Autowired
 	private EmailService emailService;
 
 	@Autowired
 	private GradeService gradeService;
+	
+	@Autowired
+	private UserService userService;
 
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));
@@ -108,7 +117,7 @@ public class GradeController {
 
 	// dodeli ocenu
 	@RequestMapping(method = RequestMethod.POST, value = "{teacherId}/addNewGradeToStudent/{studentId}/forSubject/{subjectId}")
-	@Secured("ROLE_TEACHER")
+	@Secured({"ROLE_TEACHER", "ROLE_ADMIN"})
 	public ResponseEntity<?> addNewGradeToStudent(@PathVariable Integer teacherId, @PathVariable Integer studentId,
 			@PathVariable Integer subjectId, @Valid @RequestBody GradeDTO gradeDTO, BindingResult result) {
 		if (result.hasErrors()) {
@@ -199,24 +208,61 @@ public class GradeController {
 
 	// lista svih ocena jednog studenta
 	@RequestMapping(method = RequestMethod.GET, value = "/getAllGradesForStudent/{studentId}")
-	@Secured({"ROLE_STUDENT", "ROLE_PARENT"})
+	@Secured({"ROLE_STUDENT", "ROLE_PARENT", "ROLE_ADMIN"})
 	public ResponseEntity<?> getAllGradesForStudent(@PathVariable Integer studentId) {
 
+		StudentEntity student = studentRepository.findById(studentId).get();
+		UserEntity user = userRepository.findById(1).get();
+		
 		if (studentRepository.existsById(studentId)) {
-			List<GradeEntity> grades = new ArrayList<>();
-			grades = (List<GradeEntity>) gradeService.findAllGradesByStudent(studentId);
-			if (!grades.isEmpty()) {
-				logger.info("Viewed all grades for student with id " + studentId);
-				return new ResponseEntity<List<GradeEntity>>(grades, HttpStatus.OK);
+			String username = userService.getLoggedUser();
+			if (username.equals(student.getUsername()) || username.equals(student.getParent().getUsername())
+					|| username.equals(user.getUsername())) {
+				List<GradeEntity> grades = new ArrayList<>();
+				grades = (List<GradeEntity>) gradeService.findAllGradesByStudent(studentId);
+				if (!grades.isEmpty()) {
+					logger.info("Viewed all grades for student with id " + studentId);
+					return new ResponseEntity<List<GradeEntity>>(grades, HttpStatus.OK);
+				} else {
+					return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Grades not found"),
+							HttpStatus.NOT_FOUND);
+				}
 			} else {
-				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Grades not found"),
-						HttpStatus.NOT_FOUND);
+				return new ResponseEntity<RESTError>(
+						new RESTError(HttpStatus.UNAUTHORIZED.value(), "You are unauthorized to view grades of student with id number " + studentId),
+						HttpStatus.UNAUTHORIZED);
 			}
+			
 		} else {
 			return new ResponseEntity<RESTError>(
 					new RESTError(HttpStatus.NOT_FOUND.value(), "Student with id number " + studentId + " not found"),
 					HttpStatus.NOT_FOUND);
 		}
-// da teacher vidi samo svoj predmet, da parent vidi samo svoju decu, da studet vidi samo sebe
+	}
+	
+	// lista svih ocena i predmeta kojima predaje  nastavnik
+	@RequestMapping(method = RequestMethod.GET, value = "/getAllGradesForSubject/{subjectId}")
+	@Secured({"ROLE_TEACHER", "ROLE_ADMIN"})
+	public ResponseEntity<?> getAllGradesForSubject(@PathVariable Integer subjectId) {
+
+		UserEntity user = userRepository.findById(1).get();
+		UserEntity teacher = userRepository.findByRole("ROLE_TEACHER");
+		
+		if (subjectRepository.existsById(subjectId)) {
+			String username = userService.getLoggedUser();
+			if (username.equals(teacher.getUsername()) || username.equals(user.getUsername())) {
+		// TODO
+			} else {
+				return new ResponseEntity<RESTError>(
+						new RESTError(HttpStatus.UNAUTHORIZED.value(), "You are unauthorized to view grades of student with id number " ),
+						HttpStatus.UNAUTHORIZED);
+			}
+			
+		} else {
+			return new ResponseEntity<RESTError>(
+					new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + subjectId + " not found"),
+					HttpStatus.NOT_FOUND);
+		}
+		return null;
 	}
 }

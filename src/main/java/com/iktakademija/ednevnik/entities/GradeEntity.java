@@ -49,7 +49,7 @@ public class GradeEntity {
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "teacherSubjectStudent")
 	private TeacherSubjectStudentEntity teacherSubjectStudent;
-	
+		
 	@JsonView(Views.Admin.class)
 	@Version
 	private Integer version;
@@ -59,6 +59,20 @@ public class GradeEntity {
 		// TODO Auto-generated constructor stub
 	}
 	
+	public GradeEntity(Integer id,
+			@NotNull(message = "Grade type must not be null. Accepted values are: TEST, ORAL, CLASS_ACTIVITY") EGradeType gradeType,
+			@Range(min = 1, max = 5) @NotNull(message = "Grade must not be left blank. Accepted values are between {min} and {max}.") Integer grade,
+			LocalDate date, TeacherSubjectStudentEntity teacherSubjectStudent) {
+		super();
+		this.id = id;
+		this.gradeType = gradeType;
+		this.grade = grade;
+		this.date = date;
+		this.teacherSubjectStudent = teacherSubjectStudent;
+	}
+
+
+
 	public Integer getId() {
 		return id;
 	}

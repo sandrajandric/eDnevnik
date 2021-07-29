@@ -42,6 +42,7 @@ import com.iktakademija.ednevnik.repositories.TeacherSubjectStudentRepository;
 import com.iktakademija.ednevnik.repositories.UserRepository;
 import com.iktakademija.ednevnik.services.EmailService;
 import com.iktakademija.ednevnik.services.GradeService;
+import com.iktakademija.ednevnik.services.TeacherSubjectStudentService;
 import com.iktakademija.ednevnik.services.UserService;
 import com.iktakademija.ednevnik.services.dto.EmailObject;
 
@@ -81,6 +82,9 @@ public class GradeController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private TeacherSubjectStudentService tesubSubjectStudentService;
 
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));
@@ -135,38 +139,46 @@ public class GradeController {
 			if (teacherRepository.existsById(teacherId)) {
 				if (subjectRepository.existsById(subjectId)) {
 					if (teacherSubjectRepository.existsSubjectIdAndTeacherId(subjectId, teacherId) >= 1) {
-						if (subject.getSubjectForYear().equals(student.getClasss().getYear())) {
-							tsse.setStudent(student);
-							tsse.setTeacherSubject(teacherSubject);
-							newGrade.setGrade(gradeDTO.getGrade());
-							newGrade.setGradeType(gradeDTO.getGradeType());
-							newGrade.setDate(LocalDate.now());
-							newGrade.setTeacherSubjectStudent(tsse);
+						if (tesubSubjectStudentService.existsTeacherSubjectStudent(teacherId, subjectId, studentId) >= 1) {
+							if (subject.getSubjectForYear().equals(student.getClasss().getYear())) {
+								tsse.setStudent(student);
+								tsse.setTeacherSubject(teacherSubject);
+								newGrade.setGrade(gradeDTO.getGrade());
+								newGrade.setGradeType(gradeDTO.getGradeType());
+								newGrade.setDate(LocalDate.now());
+								newGrade.setTeacherSubjectStudent(tsse);
 
-							teacherSubjectStudentRepository.save(tsse);
-							gradeRepository.save(newGrade);
-							logger.info("Created grade " + newGrade.toString());
+								teacherSubjectStudentRepository.save(tsse);
+								gradeRepository.save(newGrade);
+								logger.info("Created grade " + newGrade.toString());
 
-							if (tsse.getStudent().getParent().getEmail() != null) {
-								EmailObject emailObject = new EmailObject();
-								emailObject.setTo(tsse.getStudent().getParent().getEmail());
-								emailObject.setSubject("New grade has been added");
-								emailObject.setText(newGrade.toString());
-								emailService.sendSimpleMessage(emailObject);
+								if (tsse.getStudent().getParent().getEmail() != null) {
+									EmailObject emailObject = new EmailObject();
+									emailObject.setTo(tsse.getStudent().getParent().getEmail());
+									emailObject.setSubject("New grade has been added");
+									emailObject.setText(newGrade.toString());
+									emailService.sendSimpleMessage(emailObject);
 
-								logger.info("Email with grade id " + newGrade.getId()
-										+ " has been sent to parent email " + tsse.getStudent().getParent().getEmail());
+									logger.info("Email with grade id " + newGrade.getId()
+											+ " has been sent to parent email " + tsse.getStudent().getParent().getEmail());
+								} else {
+									return new ResponseEntity<RESTError>(
+											new RESTError(HttpStatus.NOT_FOUND.value(), "Email not found"),
+											HttpStatus.NOT_FOUND);
+								}
+								return new ResponseEntity<GradeEntity>(newGrade, HttpStatus.CREATED);
 							} else {
 								return new ResponseEntity<RESTError>(
-										new RESTError(HttpStatus.NOT_FOUND.value(), "Email not found"),
-										HttpStatus.NOT_FOUND);
+										new RESTError(HttpStatus.BAD_REQUEST.value(),
+												"Class year and subject for year have to be the same "),
+										HttpStatus.BAD_REQUEST);
 							}
-							return new ResponseEntity<GradeEntity>(newGrade, HttpStatus.CREATED);
 						} else {
 							return new ResponseEntity<RESTError>(
-									new RESTError(HttpStatus.BAD_REQUEST.value(),
-											"Class year and subject for year have to be the same "),
-									HttpStatus.BAD_REQUEST);
+									new RESTError(HttpStatus.NOT_FOUND.value(),
+											"Student with id number " + studentId
+													+ " is not listening to subject with id number " + subjectId + " and teacher with id number " + teacherId),
+									HttpStatus.NOT_FOUND);
 						}
 					} else {
 						return new ResponseEntity<RESTError>(

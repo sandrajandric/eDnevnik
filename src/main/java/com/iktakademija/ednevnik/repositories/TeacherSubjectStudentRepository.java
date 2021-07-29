@@ -6,5 +6,4 @@ import com.iktakademija.ednevnik.entities.TeacherSubjectStudentEntity;
 
 public interface TeacherSubjectStudentRepository extends CrudRepository<TeacherSubjectStudentEntity, Integer> {
 
-	
 }

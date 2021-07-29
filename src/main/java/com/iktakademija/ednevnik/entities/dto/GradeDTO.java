@@ -5,8 +5,6 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
 
-import com.iktakademija.ednevnik.entities.StudentEntity;
-import com.iktakademija.ednevnik.entities.TeacherSubjectEntity;
 import com.iktakademija.ednevnik.entities.enums.EGradeType;
 
 public class GradeDTO {
@@ -46,6 +44,6 @@ public class GradeDTO {
 		this.grade = grade;
 		
 	}
-	
+
 	
 }

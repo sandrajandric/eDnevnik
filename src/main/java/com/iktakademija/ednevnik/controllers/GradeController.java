@@ -29,6 +29,7 @@ import com.iktakademija.ednevnik.controllers.util.RESTError;
 import com.iktakademija.ednevnik.entities.GradeEntity;
 import com.iktakademija.ednevnik.entities.StudentEntity;
 import com.iktakademija.ednevnik.entities.SubjectEntity;
+import com.iktakademija.ednevnik.entities.TeacherEntity;
 import com.iktakademija.ednevnik.entities.TeacherSubjectEntity;
 import com.iktakademija.ednevnik.entities.TeacherSubjectStudentEntity;
 import com.iktakademija.ednevnik.entities.UserEntity;
@@ -43,6 +44,7 @@ import com.iktakademija.ednevnik.repositories.UserRepository;
 import com.iktakademija.ednevnik.services.EmailService;
 import com.iktakademija.ednevnik.services.GradeService;
 import com.iktakademija.ednevnik.services.TeacherSubjectStudentService;
+import com.iktakademija.ednevnik.services.TeacherSubjectStudentServiceImpl;
 import com.iktakademija.ednevnik.services.UserService;
 import com.iktakademija.ednevnik.services.dto.EmailObject;
 
@@ -70,7 +72,7 @@ public class GradeController {
 
 	@Autowired
 	private TeacherSubjectStudentRepository teacherSubjectStudentRepository;
-	
+
 	@Autowired
 	private UserRepository userRepository;
 
@@ -79,10 +81,10 @@ public class GradeController {
 
 	@Autowired
 	private GradeService gradeService;
-	
+
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private TeacherSubjectStudentService tesubSubjectStudentService;
 
@@ -121,7 +123,7 @@ public class GradeController {
 
 	// dodeli ocenu
 	@RequestMapping(method = RequestMethod.POST, value = "{teacherId}/addNewGradeToStudent/{studentId}/forSubject/{subjectId}")
-	@Secured({"ROLE_TEACHER", "ROLE_ADMIN"})
+	@Secured({ "ROLE_TEACHER", "ROLE_ADMIN" })
 	public ResponseEntity<?> addNewGradeToStudent(@PathVariable Integer teacherId, @PathVariable Integer studentId,
 			@PathVariable Integer subjectId, @Valid @RequestBody GradeDTO gradeDTO, BindingResult result) {
 		if (result.hasErrors()) {
@@ -139,7 +141,8 @@ public class GradeController {
 			if (teacherRepository.existsById(teacherId)) {
 				if (subjectRepository.existsById(subjectId)) {
 					if (teacherSubjectRepository.existsSubjectIdAndTeacherId(subjectId, teacherId) >= 1) {
-						if (tesubSubjectStudentService.existsTeacherSubjectStudent(teacherId, subjectId, studentId) >= 1) {
+						if (tesubSubjectStudentService.existsTeacherSubjectStudent(teacherId, subjectId,
+								studentId) >= 1) {
 							if (subject.getSubjectForYear().equals(student.getClasss().getYear())) {
 								tsse.setStudent(student);
 								tsse.setTeacherSubject(teacherSubject);
@@ -160,7 +163,8 @@ public class GradeController {
 									emailService.sendSimpleMessage(emailObject);
 
 									logger.info("Email with grade id " + newGrade.getId()
-											+ " has been sent to parent email " + tsse.getStudent().getParent().getEmail());
+											+ " has been sent to parent email "
+											+ tsse.getStudent().getParent().getEmail());
 								} else {
 									return new ResponseEntity<RESTError>(
 											new RESTError(HttpStatus.NOT_FOUND.value(), "Email not found"),
@@ -177,7 +181,8 @@ public class GradeController {
 							return new ResponseEntity<RESTError>(
 									new RESTError(HttpStatus.NOT_FOUND.value(),
 											"Student with id number " + studentId
-													+ " is not listening to subject with id number " + subjectId + " and teacher with id number " + teacherId),
+													+ " is not listening to subject with id number " + subjectId
+													+ " and teacher with id number " + teacherId),
 									HttpStatus.NOT_FOUND);
 						}
 					} else {
@@ -220,12 +225,12 @@ public class GradeController {
 
 	// lista svih ocena jednog studenta
 	@RequestMapping(method = RequestMethod.GET, value = "/getAllGradesForStudent/{studentId}")
-	@Secured({"ROLE_STUDENT", "ROLE_PARENT", "ROLE_ADMIN"})
+	@Secured({ "ROLE_STUDENT", "ROLE_PARENT", "ROLE_ADMIN" })
 	public ResponseEntity<?> getAllGradesForStudent(@PathVariable Integer studentId) {
 
 		StudentEntity student = studentRepository.findById(studentId).get();
 		UserEntity user = userRepository.findById(1).get();
-		
+
 		if (studentRepository.existsById(studentId)) {
 			String username = userService.getLoggedUser();
 			if (username.equals(student.getUsername()) || username.equals(student.getParent().getUsername())
@@ -236,45 +241,70 @@ public class GradeController {
 					logger.info("Viewed all grades for student with id " + studentId);
 					return new ResponseEntity<List<GradeEntity>>(grades, HttpStatus.OK);
 				} else {
-					return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Grades not found"),
-							HttpStatus.NOT_FOUND);
+					return new ResponseEntity<RESTError>(
+							new RESTError(HttpStatus.NOT_FOUND.value(), "Grades not found"), HttpStatus.NOT_FOUND);
 				}
 			} else {
 				return new ResponseEntity<RESTError>(
-						new RESTError(HttpStatus.UNAUTHORIZED.value(), "You are unauthorized to view grades of student with id number " + studentId),
+						new RESTError(HttpStatus.UNAUTHORIZED.value(),
+								"You are unauthorized to view grades of student with id number " + studentId),
 						HttpStatus.UNAUTHORIZED);
 			}
-			
+
 		} else {
 			return new ResponseEntity<RESTError>(
 					new RESTError(HttpStatus.NOT_FOUND.value(), "Student with id number " + studentId + " not found"),
 					HttpStatus.NOT_FOUND);
 		}
 	}
-	
-	// lista svih ocena i predmeta kojima predaje  nastavnik
+
+	// lista svih ocena i predmeta kojima predaje nastavnik
 	@RequestMapping(method = RequestMethod.GET, value = "/getAllGradesForSubject/{subjectId}")
 	@Secured({"ROLE_TEACHER", "ROLE_ADMIN"})
 	public ResponseEntity<?> getAllGradesForSubject(@PathVariable Integer subjectId) {
 
+		String username = userService.getLoggedUser();
+		
 		UserEntity user = userRepository.findById(1).get();
-		UserEntity teacher = userRepository.findByRole("ROLE_TEACHER");
+		UserEntity teacher = userRepository.findByUsername(username);
 		
 		if (subjectRepository.existsById(subjectId)) {
-			String username = userService.getLoggedUser();
 			if (username.equals(teacher.getUsername()) || username.equals(user.getUsername())) {
-		// TODO
+				if (subjectRepository.existsById(subjectId)) {
+					if (userRepository.existsByUsername(username)) {
+						if (teacherSubjectRepository.existsSubjectIdAndTeacherId(subjectId, teacher.getId()) >= 1) {
+							List<GradeEntity> grades = new ArrayList<>();
+							grades = (List<GradeEntity>) tesubSubjectStudentService.findGradesForSubjectOfTeacher(subjectId, teacher.getId());
+							if (!grades.isEmpty()) {
+								logger.info("Viewed all grades for subject with id " + subjectId);
+								return new ResponseEntity<List<GradeEntity>>(grades, HttpStatus.OK);
+							} else {
+								return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Grades not found")
+										, HttpStatus.NOT_FOUND);
+							}
+						} else {
+							return new ResponseEntity<RESTError>(
+									new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + subjectId
+										+ " is not assigned to teacher with id number " + teacher.getId()), HttpStatus.NOT_FOUND);
+						}
+					} else {
+						return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Teacher not found"),
+								HttpStatus.NOT_FOUND);
+					}
+				} else {
+					return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + subjectId + " not found"),
+							HttpStatus.NOT_FOUND);
+				}
+				
+				
 			} else {
-				return new ResponseEntity<RESTError>(
-						new RESTError(HttpStatus.UNAUTHORIZED.value(), "You are unauthorized to view grades of student with id number " ),
+				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.UNAUTHORIZED.value(), "You are unauthorized to view grades of student with id number " ),
 						HttpStatus.UNAUTHORIZED);
 			}
 			
 		} else {
-			return new ResponseEntity<RESTError>(
-					new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + subjectId + " not found"),
+			return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + subjectId + " not found"),
 					HttpStatus.NOT_FOUND);
 		}
-		return null;
 	}
 }

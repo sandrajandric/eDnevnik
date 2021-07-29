@@ -7,6 +7,8 @@ import com.iktakademija.ednevnik.entities.UserEntity;
 public interface UserRepository extends CrudRepository<UserEntity, Integer> {
 	
 	UserEntity findByEmail(String email);
-
-	UserEntity findByRole(String role);
+	
+	Boolean existsByUsername(String username);
+	
+	UserEntity findByUsername(String username);
 }

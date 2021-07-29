@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iktakademija.ednevnik.controllers.util.RESTError;
 import com.iktakademija.ednevnik.entities.ClassEntity;
 import com.iktakademija.ednevnik.entities.GradeEntity;
+import com.iktakademija.ednevnik.entities.StudentEntity;
+import com.iktakademija.ednevnik.entities.SubjectEntity;
 import com.iktakademija.ednevnik.entities.TeacherSubjectStudentEntity;
 import com.iktakademija.ednevnik.entities.dto.ClassDTO;
 import com.iktakademija.ednevnik.entities.dto.GradeDTO;
@@ -34,6 +36,8 @@ import com.iktakademija.ednevnik.repositories.SubjectRepository;
 import com.iktakademija.ednevnik.repositories.TeacherRepository;
 import com.iktakademija.ednevnik.repositories.TeacherSubjectRepository;
 import com.iktakademija.ednevnik.repositories.TeacherSubjectStudentRepository;
+import com.iktakademija.ednevnik.services.EmailService;
+import com.iktakademija.ednevnik.services.dto.EmailObject;
 
 @RestController
 @RequestMapping(value = "/api/v1/grades")
@@ -59,6 +63,9 @@ public class GradeController {
 	
 	@Autowired
 	private TeacherSubjectStudentRepository teacherSubjectStudentRepository;
+	
+	@Autowired
+	private EmailService emailService;
 	
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));
@@ -92,8 +99,8 @@ public class GradeController {
 		}
 	}
 	
-/*	// dodeli ocenu
-	@RequestMapping(method = RequestMethod.POST, value = "{teacherId}/addNewGradeToStudent/{studentId}/{subjectId}")
+	// dodeli ocenu
+	@RequestMapping(method = RequestMethod.POST, value = "{teacherId}/addNewGradeToStudent/{studentId}/forSubject/{subjectId}")
 	public ResponseEntity<?> addNewGradeToStudent(@PathVariable Integer teacherId, @PathVariable Integer studentId,
 			@PathVariable Integer subjectId, @Valid @RequestBody GradeDTO gradeDTO, BindingResult result) {
 		if (result.hasErrors()) {
@@ -101,21 +108,40 @@ public class GradeController {
 		}
 
 		GradeEntity newGrade = new GradeEntity();
+		SubjectEntity subject = subjectRepository.findById(subjectId).get();
+		StudentEntity student = studentRepository.findById(studentId).get();
 		TeacherSubjectStudentEntity tsse = new TeacherSubjectStudentEntity();
 
 		if (studentRepository.existsById(studentId)) {
 			if (teacherRepository.existsById(teacherId)) {
 				if (subjectRepository.existsById(subjectId)) {
 					if (teacherSubjectRepository.existsSubjectIdAndTeacherId(subjectId, teacherId) >= 1) {
-						newGrade.setGrade(gradeDTO.getGrade());
-						newGrade.setGradeType(gradeDTO.getGradeType());
-						newGrade.setDate(LocalDate.now());
-						tsse.setPupil(studentRepository.findById(studentId).get());
-						teacherSubjectStudentRepository.save(tsse);
-						gradeRepository.save(newGrade);
-						
-						logger.info("Created grade " + newGrade.toString());
-						return new ResponseEntity<GradeEntity>(newGrade, HttpStatus.CREATED);
+						if (subject.getSubjectForYear().equals(student.getClasss().getYear())) {
+							newGrade.setGrade(gradeDTO.getGrade());
+							newGrade.setGradeType(gradeDTO.getGradeType());
+							newGrade.setDate(LocalDate.now());
+							newGrade.setTeacherSubjectStudent(tsse);
+							gradeRepository.save(newGrade);
+							
+							logger.info("Created grade " + newGrade.toString());
+							
+							if (tsse.getStudent().getParent().getEmail() != null) {
+								EmailObject emailObject = new EmailObject();
+								emailObject.setTo(tsse.getStudent().getParent().getEmail());
+								emailObject.setSubject("New grade has been added");
+								emailObject.setText(newGrade.toString());
+								emailService.sendSimpleMessage(emailObject);
+								
+								logger.info("Email with grade id " + newGrade.getId() + 
+										" has been sent to parent email " + tsse.getStudent().getParent().getEmail());
+								} else {
+									return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), 
+											"Email not found"), HttpStatus.NOT_FOUND);								}
+							return new ResponseEntity<GradeEntity>(newGrade, HttpStatus.CREATED);
+						} else {
+							return new ResponseEntity<RESTError>(new RESTError(HttpStatus.BAD_REQUEST.value(), 
+									"Class year and subject for year have to be the same "), HttpStatus.BAD_REQUEST);
+						}
 					} else {
 						return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), 
 								"Subject with id number " + subjectId + " is not assigned to teacher with id number "
@@ -134,5 +160,4 @@ public class GradeController {
 					"Student with id number " + studentId + " not found"), HttpStatus.NOT_FOUND);
 		}	
 
-	} */
-}
+	}}

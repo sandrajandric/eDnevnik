@@ -16,7 +16,7 @@ public class UserDTOPut {
 	private String username;
 	
 	private String password;
-
+	
 	public UserDTOPut() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -24,7 +24,7 @@ public class UserDTOPut {
 
 	public UserDTOPut(String name, String surname, @Email(message = "Email is not valid.") String email,
 			@Size(min = 5, max = 20, message = "Username must be between {min} and {max} characters long.") String username,
-			@Size(min = 8, max = 32, message = "Password must be between {min} and {max} characters long.") String password) {
+			String password) {
 		super();
 		this.name = name;
 		this.surname = surname;
@@ -73,6 +73,4 @@ public class UserDTOPut {
 		this.password = password;
 	}
 
-	
-	
 }

@@ -11,7 +11,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
@@ -45,6 +44,11 @@ public class GradeEntity {
 	@JsonView(Views.Private.class)
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private LocalDate date;
+	
+	@JsonBackReference(value = "gtsp")
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	@JoinColumn(name = "teacher_subject_student")
+	private TeacherSubjectStudentEntity teacherSubjectStudent;
 	
 	@JsonView(Views.Admin.class)
 	@Version
@@ -85,6 +89,14 @@ public class GradeEntity {
 
 	public void setDate(LocalDate date) {
 		this.date = date;
+	}
+
+	public TeacherSubjectStudentEntity getTeacherSubjectStudent() {
+		return teacherSubjectStudent;
+	}
+
+	public void setTeacherSubjectStudent(TeacherSubjectStudentEntity teacherSubjectStudent) {
+		this.teacherSubjectStudent = teacherSubjectStudent;
 	}
 
 	@Override

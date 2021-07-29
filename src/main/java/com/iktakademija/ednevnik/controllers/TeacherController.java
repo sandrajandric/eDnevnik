@@ -164,12 +164,12 @@ public class TeacherController {
 			SubjectEntity subject = subjectRepository.findById(subjectId).get();
 			TeacherEntity teacher = teacherRepository.findById(teacherId).get();
 			TeacherSubjectEntity teacherSubject = new TeacherSubjectEntity();
-			List<TeacherSubjectEntity> listOfSubjects = new ArrayList<>();
+			List<TeacherSubjectEntity> listTeacherSubject = new ArrayList<>();
 			if (!(teacherSubjectRepository.existsSubjectIdAndTeacherId(subjectId, teacherId) >= 1)) {
 				teacherSubject.setSubject(subject);
 				teacherSubject.setTeacher(teacher);
-				listOfSubjects.add(teacherSubject);
-				subject.setHasSubjects(listOfSubjects);
+				listTeacherSubject.add(teacherSubject);
+				subject.setHasTeachers(listTeacherSubject);
 				
 			} else {
 				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.BAD_REQUEST.value(),

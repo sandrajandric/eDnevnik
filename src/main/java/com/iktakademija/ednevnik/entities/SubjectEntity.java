@@ -62,7 +62,7 @@ public class SubjectEntity {
 	@JsonIgnore
 	@JsonManagedReference(value = "tss")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "subject")
-	private List<TeacherSubjectEntity> hasSubjects = new ArrayList<>();
+	private List<TeacherSubjectEntity> hasTeachers = new ArrayList<>();
 	
 	@JsonView(Views.Admin.class)
 	@Version
@@ -113,12 +113,13 @@ public class SubjectEntity {
 		this.semester = semester;
 	}
 
-	public List<TeacherSubjectEntity> getHasSubjects() {
-		return hasSubjects;
+
+	public List<TeacherSubjectEntity> getHasTeachers() {
+		return hasTeachers;
 	}
 
-	public void setHasSubjects(List<TeacherSubjectEntity> hasSubjects) {
-		this.hasSubjects = hasSubjects;
+	public void setHasTeachers(List<TeacherSubjectEntity> hasTeachers) {
+		this.hasTeachers = hasTeachers;
 	}
 
 	public EYear getSubjectForYear() {

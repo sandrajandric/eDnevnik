@@ -35,15 +35,28 @@ public class TeacherSubjectStudentEntity {
 	@JoinColumn(name = "student")
 	private StudentEntity student;
 
+	@JsonBackReference(value = "tse")
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	@JoinColumn(name = "teacher_subject")
+	private TeacherSubjectEntity teacherSubject;
+	
 	@JsonView(Views.Private.class)
 	@JsonManagedReference(value = "gtsp")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
-	@JoinColumn(name = "teacher_subject_student")
-	private List<GradeEntity> hasGrades = new ArrayList<>();
+	private List<GradeEntity> grades = new ArrayList<>();
 
 	public TeacherSubjectStudentEntity() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+
+	public TeacherSubjectStudentEntity(Integer id, StudentEntity student, TeacherSubjectEntity teacherSubject,
+			List<GradeEntity> grades) {
+		super();
+		this.id = id;
+		this.student = student;
+		this.teacherSubject = teacherSubject;
+		this.grades = grades;
 	}
 
 	public Integer getId() {
@@ -54,20 +67,30 @@ public class TeacherSubjectStudentEntity {
 		this.id = id;
 	}
 
-	public StudentEntity getPupil() {
+	public StudentEntity getStudent() {
 		return student;
 	}
 
-	public void setPupil(StudentEntity student) {
+	public void setStudent(StudentEntity student) {
 		this.student = student;
 	}
 
-	public List<GradeEntity> getHasGrades() {
-		return hasGrades;
+	public TeacherSubjectEntity getTeacherSubject() {
+		return teacherSubject;
 	}
 
-	public void setHasGrades(List<GradeEntity> hasGrades) {
-		this.hasGrades = hasGrades;
+	public void setTeacherSubject(TeacherSubjectEntity teacherSubject) {
+		this.teacherSubject = teacherSubject;
 	}
+
+	public List<GradeEntity> getGrades() {
+		return grades;
+	}
+
+	public void setGrades(List<GradeEntity> grades) {
+		this.grades = grades;
+	}
+
+
 
 }

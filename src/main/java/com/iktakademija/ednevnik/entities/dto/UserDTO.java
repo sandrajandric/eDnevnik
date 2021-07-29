@@ -31,7 +31,7 @@ public class UserDTO {
 			@NotBlank(message = "Last name must not be left blank.") String surname,
 			@Email(message = "Email is not valid.") String email,
 			@NotBlank(message = "Username must not be left blank.") @Size(min = 5, max = 20, message = "Username must be between {min} and {max} characters long.") String username,
-			@NotBlank(message = "Password must not be left blank.") @Size(min = 8, max = 32, message = "Password must be between {min} and {max} characters long.") String password) {
+			@NotBlank(message = "Password must not be left blank.") String password) {
 		super();
 		this.name = name;
 		this.surname = surname;
@@ -79,6 +79,4 @@ public class UserDTO {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	
 }

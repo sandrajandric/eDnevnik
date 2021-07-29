@@ -5,6 +5,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
 
+import com.iktakademija.ednevnik.entities.StudentEntity;
+import com.iktakademija.ednevnik.entities.TeacherSubjectEntity;
 import com.iktakademija.ednevnik.entities.enums.EGradeType;
 
 public class GradeDTO {
@@ -15,7 +17,7 @@ public class GradeDTO {
 	@Range(min = 1, max = 5)
 	@NotNull(message = "Grade must not be left blank. Accepted values are between {min} and {max}.")
 	private Integer grade;
-
+	
 	public GradeDTO() {
 		super();
 	}
@@ -42,6 +44,7 @@ public class GradeDTO {
 
 	public void setGrade(Integer grade) {
 		this.grade = grade;
+		
 	}
 	
 	

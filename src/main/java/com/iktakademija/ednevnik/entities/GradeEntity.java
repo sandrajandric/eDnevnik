@@ -101,7 +101,11 @@ public class GradeEntity {
 
 	@Override
 	public String toString() {
-		return "GradeType: " + getGradeType() + ", Grade: " + getGrade() + ", Date: " + getDate();
+		return "GradeType: " + getGradeType() + "\nGrade: " + getGrade() + "\nDate: " + getDate() +
+			"\nStudent: " + getTeacherSubjectStudent().getStudent().getName() + " " +
+			getTeacherSubjectStudent().getStudent().getSurname() + "\nTeacher: " + getTeacherSubjectStudent().getTeacherSubject().getTeacher().getName()
+			+ " " + getTeacherSubjectStudent().getTeacherSubject().getTeacher().getSurname() + "\nSubject: "
+			+ getTeacherSubjectStudent().getTeacherSubject().getSubject().getNameOfSubject();
 	}
 	
 }

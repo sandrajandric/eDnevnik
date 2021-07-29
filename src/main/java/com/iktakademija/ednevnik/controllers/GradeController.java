@@ -1,10 +1,14 @@
 package com.iktakademija.ednevnik.controllers;
 
+import java.net.http.HttpRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.persistence.Convert;
+import javax.servlet.http.HttpSessionContext;
+import javax.sound.sampled.AudioFormat.Encoding;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -22,15 +26,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iktakademija.ednevnik.controllers.util.RESTError;
-import com.iktakademija.ednevnik.entities.ClassEntity;
 import com.iktakademija.ednevnik.entities.GradeEntity;
 import com.iktakademija.ednevnik.entities.StudentEntity;
 import com.iktakademija.ednevnik.entities.SubjectEntity;
 import com.iktakademija.ednevnik.entities.TeacherSubjectEntity;
 import com.iktakademija.ednevnik.entities.TeacherSubjectStudentEntity;
-import com.iktakademija.ednevnik.entities.dto.ClassDTO;
 import com.iktakademija.ednevnik.entities.dto.GradeDTO;
-import com.iktakademija.ednevnik.entities.enums.EYear;
 import com.iktakademija.ednevnik.repositories.GradeRepository;
 import com.iktakademija.ednevnik.repositories.StudentRepository;
 import com.iktakademija.ednevnik.repositories.SubjectRepository;
@@ -38,6 +39,7 @@ import com.iktakademija.ednevnik.repositories.TeacherRepository;
 import com.iktakademija.ednevnik.repositories.TeacherSubjectRepository;
 import com.iktakademija.ednevnik.repositories.TeacherSubjectStudentRepository;
 import com.iktakademija.ednevnik.services.EmailService;
+import com.iktakademija.ednevnik.services.GradeService;
 import com.iktakademija.ednevnik.services.dto.EmailObject;
 
 @RestController
@@ -49,25 +51,28 @@ public class GradeController {
 
 	@Autowired
 	private GradeRepository gradeRepository;
-	
+
 	@Autowired
 	private StudentRepository studentRepository;
-	
+
 	@Autowired
 	private TeacherRepository teacherRepository;
-	
+
 	@Autowired
 	private SubjectRepository subjectRepository;
-	
+
 	@Autowired
 	private TeacherSubjectRepository teacherSubjectRepository;
-	
+
 	@Autowired
 	private TeacherSubjectStudentRepository teacherSubjectStudentRepository;
-	
+
 	@Autowired
 	private EmailService emailService;
-	
+
+	@Autowired
+	private GradeService gradeService;
+
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));
 	}
@@ -91,7 +96,8 @@ public class GradeController {
 	public ResponseEntity<?> getGradeById(@PathVariable Integer id) {
 		if (gradeRepository.existsById(id)) {
 			GradeEntity gradeEntity = gradeRepository.findById(id).get();
-			logger.info("Viewed grade with id number " + id);
+			gradeEntity.toString();
+			logger.info("Viewed grade: " + gradeEntity.toString());
 			return new ResponseEntity<GradeEntity>(gradeEntity, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<RESTError>(
@@ -99,9 +105,10 @@ public class GradeController {
 					HttpStatus.NOT_FOUND);
 		}
 	}
-	
+
 	// dodeli ocenu
 	@RequestMapping(method = RequestMethod.POST, value = "{teacherId}/addNewGradeToStudent/{studentId}/forSubject/{subjectId}")
+	@Secured("ROLE_TEACHER")
 	public ResponseEntity<?> addNewGradeToStudent(@PathVariable Integer teacherId, @PathVariable Integer studentId,
 			@PathVariable Integer subjectId, @Valid @RequestBody GradeDTO gradeDTO, BindingResult result) {
 		if (result.hasErrors()) {
@@ -111,7 +118,8 @@ public class GradeController {
 		GradeEntity newGrade = new GradeEntity();
 		SubjectEntity subject = subjectRepository.findById(subjectId).get();
 		StudentEntity student = studentRepository.findById(studentId).get();
-		TeacherSubjectEntity teacherSubject = teacherSubjectRepository.findBySubjectIdAndTeacherId(subjectId, teacherId);
+		TeacherSubjectEntity teacherSubject = teacherSubjectRepository.findBySubjectIdAndTeacherId(subjectId,
+				teacherId);
 		TeacherSubjectStudentEntity tsse = new TeacherSubjectStudentEntity();
 
 		if (studentRepository.existsById(studentId)) {
@@ -125,44 +133,90 @@ public class GradeController {
 							newGrade.setGradeType(gradeDTO.getGradeType());
 							newGrade.setDate(LocalDate.now());
 							newGrade.setTeacherSubjectStudent(tsse);
-							
+
 							teacherSubjectStudentRepository.save(tsse);
 							gradeRepository.save(newGrade);
 							logger.info("Created grade " + newGrade.toString());
-							
+
 							if (tsse.getStudent().getParent().getEmail() != null) {
 								EmailObject emailObject = new EmailObject();
 								emailObject.setTo(tsse.getStudent().getParent().getEmail());
 								emailObject.setSubject("New grade has been added");
 								emailObject.setText(newGrade.toString());
 								emailService.sendSimpleMessage(emailObject);
-								
-								logger.info("Email with grade id " + newGrade.getId() + 
-										" has been sent to parent email " + tsse.getStudent().getParent().getEmail());
-								} else {
-									return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), 
-											"Email not found"), HttpStatus.NOT_FOUND);								}
+
+								logger.info("Email with grade id " + newGrade.getId()
+										+ " has been sent to parent email " + tsse.getStudent().getParent().getEmail());
+							} else {
+								return new ResponseEntity<RESTError>(
+										new RESTError(HttpStatus.NOT_FOUND.value(), "Email not found"),
+										HttpStatus.NOT_FOUND);
+							}
 							return new ResponseEntity<GradeEntity>(newGrade, HttpStatus.CREATED);
 						} else {
-							return new ResponseEntity<RESTError>(new RESTError(HttpStatus.BAD_REQUEST.value(), 
-									"Class year and subject for year have to be the same "), HttpStatus.BAD_REQUEST);
+							return new ResponseEntity<RESTError>(
+									new RESTError(HttpStatus.BAD_REQUEST.value(),
+											"Class year and subject for year have to be the same "),
+									HttpStatus.BAD_REQUEST);
 						}
 					} else {
-						return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), 
-								"Subject with id number " + subjectId + " is not assigned to teacher with id number "
-										+  teacherId), HttpStatus.NOT_FOUND);
+						return new ResponseEntity<RESTError>(
+								new RESTError(HttpStatus.NOT_FOUND.value(),
+										"Subject with id number " + subjectId
+												+ " is not assigned to teacher with id number " + teacherId),
+								HttpStatus.NOT_FOUND);
 					}
 				} else {
-					return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), 
+					return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(),
 							"Subject with id number " + subjectId + " not found"), HttpStatus.NOT_FOUND);
 				}
 			} else {
-				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), 
+				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(),
 						"Teacher with id number " + teacherId + " not found"), HttpStatus.NOT_FOUND);
 			}
 		} else {
-			return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), 
-					"Student with id number " + studentId + " not found"), HttpStatus.NOT_FOUND);
-		}	
+			return new ResponseEntity<RESTError>(
+					new RESTError(HttpStatus.NOT_FOUND.value(), "Student with id number " + studentId + " not found"),
+					HttpStatus.NOT_FOUND);
+		}
 
-	}}
+	}
+
+	// obrisi ocenu
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
+	public ResponseEntity<?> deleteGradeById(@PathVariable Integer id) {
+		if (gradeRepository.existsById(id)) {
+			gradeRepository.existsById(id);
+			gradeRepository.deleteById(id);
+			logger.info("Deleted grade with id number " + id);
+			return new ResponseEntity<GradeEntity>(HttpStatus.OK);
+		} else {
+			return new ResponseEntity<RESTError>(
+					new RESTError(HttpStatus.NOT_FOUND.value(), "Grade with id number " + id + " not found"),
+					HttpStatus.NOT_FOUND);
+		}
+	}
+
+	// lista svih ocena jednog studenta
+	@RequestMapping(method = RequestMethod.GET, value = "/getAllGradesForStudent/{studentId}")
+	@Secured({"ROLE_STUDENT", "ROLE_PARENT"})
+	public ResponseEntity<?> getAllGradesForStudent(@PathVariable Integer studentId) {
+
+		if (studentRepository.existsById(studentId)) {
+			List<GradeEntity> grades = new ArrayList<>();
+			grades = (List<GradeEntity>) gradeService.findAllGradesByStudent(studentId);
+			if (!grades.isEmpty()) {
+				logger.info("Viewed all grades for student with id " + studentId);
+				return new ResponseEntity<List<GradeEntity>>(grades, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Grades not found"),
+						HttpStatus.NOT_FOUND);
+			}
+		} else {
+			return new ResponseEntity<RESTError>(
+					new RESTError(HttpStatus.NOT_FOUND.value(), "Student with id number " + studentId + " not found"),
+					HttpStatus.NOT_FOUND);
+		}
+// da teacher vidi samo svoj predmet, da parent vidi samo svoju decu, da studet vidi samo sebe
+	}
+}

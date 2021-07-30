@@ -27,7 +27,7 @@ public class TeacherEntity extends UserEntity {
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "teacher")
 	private List<TeacherSubjectEntity> teaches = new ArrayList<>();
 	
-	@JsonManagedReference(value = "tc")
+	@JsonBackReference(value = "tc")
 	@OneToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "inChargeOfClass")
 	private ClassEntity inChargeOfClass;

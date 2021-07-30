@@ -7,6 +7,6 @@ import com.iktakademija.ednevnik.entities.enums.EYear;
 
 public interface ClassRepository extends CrudRepository<ClassEntity, Integer> {
 
-	boolean existsByClassNumberAndYear(Integer classNumber, EYear eYear);
+	Boolean existsByClassNumberAndYear(Integer classNumber, EYear eYear);
 	
 }

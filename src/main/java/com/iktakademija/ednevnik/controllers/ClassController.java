@@ -37,7 +37,7 @@ import com.iktakademija.ednevnik.repositories.TeacherRepository;
 public class ClassController {
 
 	private final Logger logger = (Logger) LoggerFactory.getLogger(this.getClass());
-	
+
 	@Autowired
 	private ClassRepository classRepository;
 
@@ -46,7 +46,6 @@ public class ClassController {
 
 	@Autowired
 	private TeacherRepository teacherRepository;
-
 
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));
@@ -107,9 +106,9 @@ public class ClassController {
 
 	// izmeni odeljenje
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-	public ResponseEntity<?> updateClass(@PathVariable Integer id, 
-			@Valid @RequestBody ClassDTOPut classDTO, BindingResult result) {
-		
+	public ResponseEntity<?> updateClass(@PathVariable Integer id, @Valid @RequestBody ClassDTOPut classDTO,
+			BindingResult result) {
+
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 		}
@@ -117,8 +116,10 @@ public class ClassController {
 			ClassEntity classEntity = classRepository.findById(id).get();
 
 			if (classRepository.existsByClassNumberAndYear(classDTO.getClassNumber(), classDTO.getYear())) {
-				return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.BAD_REQUEST.value(), "Class "
-						+ EYear.valueOf(classDTO.getYear().toString()) + " " + classDTO.getClassNumber() + " already exists."), HttpStatus.NOT_FOUND);
+				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.BAD_REQUEST.value(),
+						"Class " + EYear.valueOf(classDTO.getYear().toString()) + " " + classDTO.getClassNumber()
+								+ " already exists."),
+						HttpStatus.NOT_FOUND);
 			} else {
 				if (classDTO.getClassNumber() != null) {
 					classEntity.setClassNumber(classDTO.getClassNumber());
@@ -126,27 +127,31 @@ public class ClassController {
 				if (classDTO.getYear() != null) {
 					classEntity.setYear(classDTO.getYear());
 				}
-				
+
 				classRepository.save(classEntity);
 				logger.info("Updated class with id number " + id);
 				return new ResponseEntity<ClassEntity>(classEntity, HttpStatus.OK);
 			}
 		}
 
-	return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(),"Class with id number "+id+" not found"),HttpStatus.NOT_FOUND);
+		return new ResponseEntity<RESTError>(
+				new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + id + " not found"),
+				HttpStatus.NOT_FOUND);
 
 	}
 
 	// obrisi odeljenje
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
 	public ResponseEntity<?> deleteClass(@PathVariable Integer id) {
-		
+
 		if (classRepository.existsById(id)) {
 			classRepository.deleteById(id);
 			logger.info("Deleted class with id number " + id);
 			return new ResponseEntity<HttpStatus>(HttpStatus.OK);
 		} else {
-			return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + id + " not found"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<RESTError>(
+					new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + id + " not found"),
+					HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -156,16 +161,22 @@ public class ClassController {
 			@PathVariable Integer studentId) {		
 		
 		if (classRepository.existsById(classId) && studentRepository.existsById(studentId)) {
-			ClassEntity classs = classRepository.findById(classId).get();
-			StudentEntity student = studentRepository.findById(studentId).get();
-			List<StudentEntity> students = new ArrayList<>();
-			student.setClasss(classs);
-			students.add(student);
-			classs.setStudents(students);
-			classRepository.save(classs);
-			studentRepository.save(student);
-			logger.info("Student with id number " + studentId + " added to class with id number " + classId);
-			return new ResponseEntity<ClassEntity>(classs, HttpStatus.OK);
+			if (!(studentRepository.existsClass(classId, studentId) >= 1)) {
+				ClassEntity classs= classRepository.findById(classId).get();
+				StudentEntity student = studentRepository.findById(studentId).get();
+				List<StudentEntity> students = new ArrayList<>();
+				student.setClasss(classs);
+				students.add(student);
+				classs.setStudents(students);
+				classRepository.save(classs);
+				studentRepository.save(student);
+				logger.info("Student with id number " + studentId + " added to class with id number " + classId);
+				return new ResponseEntity<ClassEntity>(classs, HttpStatus.OK);
+
+			} else {
+				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.BAD_REQUEST.value(),
+						"Student with id number " + studentId + " is already assigned to class with id number " + classId), HttpStatus.BAD_REQUEST);
+			}
 		} else {
 			if (!classRepository.existsById(classId)) {
 				return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + classId+ " not found"), HttpStatus.NOT_FOUND);
@@ -177,9 +188,8 @@ public class ClassController {
 
 	// obrisi ucenika iz odeljenja
 	@RequestMapping(method = RequestMethod.PUT, value = "/{classId}/removeStudent/{studentId}")
-	public ResponseEntity<?> removeStudentFromClass(@PathVariable Integer classId, 
-			@PathVariable Integer studentId) {
-		
+	public ResponseEntity<?> removeStudentFromClass(@PathVariable Integer classId, @PathVariable Integer studentId) {
+
 		if (classRepository.existsById(classId) && studentRepository.existsById(studentId)) {
 			ClassEntity classs = classRepository.findById(classId).get();
 			StudentEntity student = studentRepository.findById(studentId).get();
@@ -194,18 +204,20 @@ public class ClassController {
 			return new ResponseEntity<ClassEntity>(classs, HttpStatus.OK);
 		} else {
 			if (!classRepository.existsById(classId)) {
-				return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + classId+ " not found"), HttpStatus.NOT_FOUND);
+				return new ResponseEntity<RESTError>(
+						new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + classId + " not found"),
+						HttpStatus.NOT_FOUND);
 			} else {
-				return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Student with id number " + studentId + " not found"), HttpStatus.NOT_FOUND);
+				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(),
+						"Student with id number " + studentId + " not found"), HttpStatus.NOT_FOUND);
 			}
 		}
 	}
 
 	// dodaj odeljenskog
 	@RequestMapping(method = RequestMethod.PUT, value = "/{classId}/assignHomeroomTeacher/{teacherId}")
-	public ResponseEntity<?> assignHomeroomTeacher(@PathVariable Integer classId, 
-			@PathVariable Integer teacherId) {		
-		
+	public ResponseEntity<?> assignHomeroomTeacher(@PathVariable Integer classId, @PathVariable Integer teacherId) {
+
 		if (classRepository.existsById(classId) && teacherRepository.existsById(teacherId)) {
 			ClassEntity classs = classRepository.findById(classId).get();
 			TeacherEntity teacher = teacherRepository.findById(teacherId).get();
@@ -213,22 +225,26 @@ public class ClassController {
 			teacher.setInChargeOfClass(classs);
 			classRepository.save(classs);
 			teacherRepository.save(teacher);
-			logger.info("Teacher with id number " + teacherId + " added as homeroom teacher to class with id number " + classId);
+			logger.info("Teacher with id number " + teacherId + " added as homeroom teacher to class with id number "
+					+ classId);
 			return new ResponseEntity<ClassEntity>(classs, HttpStatus.OK);
 		} else {
 			if (!classRepository.existsById(classId)) {
-				return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + classId + " not found"), HttpStatus.NOT_FOUND);
+				return new ResponseEntity<RESTError>(
+						new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + classId + " not found"),
+						HttpStatus.NOT_FOUND);
 			} else {
-				return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Teacher with id number " + teacherId + " not found"), HttpStatus.NOT_FOUND);
+				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(),
+						"Teacher with id number " + teacherId + " not found"), HttpStatus.NOT_FOUND);
 			}
 		}
 	}
 
 	// obrisi odeljenskog
 	@RequestMapping(method = RequestMethod.PUT, value = "/{classId}/removeHomeroomTeacher/{teacherId}")
-	public ResponseEntity<?> removeHomeroomTeacherFromClass(@PathVariable Integer classId, 
-			@PathVariable Integer teacherId) {		
-		
+	public ResponseEntity<?> removeHomeroomTeacherFromClass(@PathVariable Integer classId,
+			@PathVariable Integer teacherId) {
+
 		if (classRepository.existsById(classId) && teacherRepository.existsById(teacherId)) {
 			ClassEntity classs = classRepository.findById(classId).get();
 			TeacherEntity teacher = teacherRepository.findById(teacherId).get();
@@ -236,13 +252,17 @@ public class ClassController {
 			classs.setHomeroomTeacher(null);
 			classRepository.save(classs);
 			teacherRepository.save(teacher);
-			logger.info("Teacher with id number " + teacherId + " removed as homeroom teacher for class with id number " + classId);
+			logger.info("Teacher with id number " + teacherId + " removed as homeroom teacher for class with id number "
+					+ classId);
 			return new ResponseEntity<ClassEntity>(classs, HttpStatus.OK);
 		} else {
 			if (!classRepository.existsById(classId)) {
-				return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + classId+ " not found"), HttpStatus.NOT_FOUND);
+				return new ResponseEntity<RESTError>(
+						new RESTError(HttpStatus.NOT_FOUND.value(), "Class with id number " + classId + " not found"),
+						HttpStatus.NOT_FOUND);
 			} else {
-				return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Teacher with id number " + teacherId + " not found"), HttpStatus.NOT_FOUND);
+				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(),
+						"Teacher with id number " + teacherId + " not found"), HttpStatus.NOT_FOUND);
 			}
 		}
 	}

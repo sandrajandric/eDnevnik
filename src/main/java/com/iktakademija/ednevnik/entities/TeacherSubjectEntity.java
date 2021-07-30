@@ -37,14 +37,14 @@ public class TeacherSubjectEntity {
 	private TeacherEntity teacher;
 	
 	@JsonView(Views.Private.class)
-	@JsonManagedReference(value = "tss")
+	@JsonBackReference(value = "tss")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "subject")
 	private SubjectEntity subject;
 	
 	@JsonManagedReference(value = "tse")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "teacherSubject")
-	private List<Grade> teacherSubjectStudent = new ArrayList<>();
+	private List<GradeEntity> teacherSubjectStudent = new ArrayList<>();
 
 	public TeacherSubjectEntity() {
 		super();
@@ -52,7 +52,7 @@ public class TeacherSubjectEntity {
 	}
 
 	public TeacherSubjectEntity(Integer id, TeacherEntity teacher, SubjectEntity subject,
-			List<Grade> teacherSubjectStudent) {
+			List<GradeEntity> teacherSubjectStudent) {
 		super();
 		this.id = id;
 		this.teacher = teacher;
@@ -84,11 +84,11 @@ public class TeacherSubjectEntity {
 		this.subject = subject;
 	}
 
-	public List<Grade> getTeacherSubjectStudent() {
+	public List<GradeEntity> getTeacherSubjectStudent() {
 		return teacherSubjectStudent;
 	}
 
-	public void setTeacherSubjectStudent(List<Grade> teacherSubjectStudent) {
+	public void setTeacherSubjectStudent(List<GradeEntity> teacherSubjectStudent) {
 		this.teacherSubjectStudent = teacherSubjectStudent;
 	}
 

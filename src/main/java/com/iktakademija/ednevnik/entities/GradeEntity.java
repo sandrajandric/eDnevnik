@@ -1,6 +1,8 @@
 package com.iktakademija.ednevnik.entities;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -9,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
@@ -17,17 +20,18 @@ import org.hibernate.validator.constraints.Range;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.iktakademija.ednevnik.entities.enums.EGradeType;
 import com.iktakademija.ednevnik.security.Views;
 
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 @Entity
 @Table(name = "grade")
 public class GradeEntity {
-	
+
 	@JsonView(Views.Admin.class)
 	@Id
 	@GeneratedValue
@@ -46,34 +50,19 @@ public class GradeEntity {
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private LocalDate date;
 	
-	@JsonManagedReference(value = "gtsp")
+	@JsonView(Views.Private.class)
+	@JsonManagedReference(value = "tspp")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
-	@JoinColumn(name = "hasGrades")
-	private Grade hasGrades;
-		
-	@JsonView(Views.Admin.class)
+	@JoinColumn(name = "student")
+	private StudentEntity student;
+
+	@JsonBackReference(value = "tse")
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	@JoinColumn(name = "teacherSubject")
+	private TeacherSubjectEntity teacherSubject;
+	
 	@Version
 	private Integer version;
-
-	public GradeEntity() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	public GradeEntity(Integer id,
-			@NotNull(message = "Grade type must not be null. Accepted values are: TEST, ORAL, CLASS_ACTIVITY") EGradeType gradeType,
-			@Range(min = 1, max = 5) @NotNull(message = "Grade must not be left blank. Accepted values are between {min} and {max}.") Integer grade,
-			LocalDate date, Grade hasGrades) {
-		super();
-		this.id = id;
-		this.gradeType = gradeType;
-		this.grade = grade;
-		this.date = date;
-		this.hasGrades = hasGrades;
-	}
-
-	
-
 
 	public Integer getId() {
 		return id;
@@ -83,45 +72,93 @@ public class GradeEntity {
 		this.id = id;
 	}
 
+
+
 	public EGradeType getGradeType() {
 		return gradeType;
 	}
+
+
 
 	public void setGradeType(EGradeType gradeType) {
 		this.gradeType = gradeType;
 	}
 
+
+
 	public Integer getGrade() {
 		return grade;
 	}
+
+
 
 	public void setGrade(Integer grade) {
 		this.grade = grade;
 	}
 
+
+
 	public LocalDate getDate() {
 		return date;
 	}
+
+
 
 	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 
-	public Grade getHasGrades() {
-		return hasGrades;
+
+
+	public StudentEntity getStudent() {
+		return student;
 	}
 
-	public void setHasGrades(Grade hasGrades) {
-		this.hasGrades = hasGrades;
+
+
+	public void setStudent(StudentEntity student) {
+		this.student = student;
 	}
+
+
+
+	public TeacherSubjectEntity getTeacherSubject() {
+		return teacherSubject;
+	}
+
+
+
+	public void setTeacherSubject(TeacherSubjectEntity teacherSubject) {
+		this.teacherSubject = teacherSubject;
+	}
+
+
+	public GradeEntity(Integer id,
+			@NotNull(message = "Grade type must not be null. Accepted values are: TEST, ORAL, CLASS_ACTIVITY") EGradeType gradeType,
+			@Range(min = 1, max = 5) @NotNull(message = "Grade must not be left blank. Accepted values are between {min} and {max}.") Integer grade,
+			LocalDate date, StudentEntity student, TeacherSubjectEntity teacherSubject) {
+		super();
+		this.id = id;
+		this.gradeType = gradeType;
+		this.grade = grade;
+		this.date = date;
+		this.student = student;
+		this.teacherSubject = teacherSubject;
+	}
+
+
+
+	public GradeEntity() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+
 
 	@Override
 	public String toString() {
 		return "GradeType: " + getGradeType() + "\nGrade: " + getGrade() + "\nDate: " + getDate() +
-			"\nStudent: " + getHasGrades().getStudent().getName() + " " +
-			getHasGrades().getStudent().getSurname() + "\nTeacher: " + getHasGrades().getTeacherSubject().getTeacher().getName()
-			+ " " + getHasGrades().getTeacherSubject().getTeacher().getSurname() + "\nSubject: "
-			+ getHasGrades().getTeacherSubject().getSubject().getNameOfSubject();
+				"\nStudent: " + getStudent() + "\nTeacher&Subject: " + getTeacherSubject();
 	}
-	
+
 }

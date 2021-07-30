@@ -93,24 +93,31 @@ public class SubjectController {
 		}
 
 		if (subjectRepository.existsById(id)) {
-			SubjectEntity subjectEntity = subjectRepository.findById(id).get();
-
-			if (subjectDTO.getNameOfSubject() != null) {
-				subjectEntity.setNameOfSubject(subjectDTO.getNameOfSubject());
-			}
-			if (subjectDTO.getWeeklyHours() != null) {
-				subjectEntity.setWeeklyHours(subjectDTO.getWeeklyHours());
-			}
-			if (subjectDTO.getSemester() != null) {
-				subjectEntity.setSemester(subjectDTO.getSemester());
-			}
-			if (subjectDTO.getSubjectForYear() != null) {
-				subjectEntity.setSubjectForYear(subjectDTO.getSubjectForYear());
-			}
 			
-			subjectRepository.save(subjectEntity);
-			logger.info("Updated subject with id number " + id);
-			return new ResponseEntity<SubjectEntity>(subjectEntity, HttpStatus.OK);
+			SubjectEntity subjectEntity = subjectRepository.findById(id).get();
+			
+			if (!(subjectDTO.getNameOfSubject().equalsIgnoreCase(subjectEntity.getNameOfSubject()))
+					&& (subjectDTO.getSubjectForYear().equals(subjectEntity.getSubjectForYear()))) {
+				if (subjectDTO.getNameOfSubject() != null) {
+					subjectEntity.setNameOfSubject(subjectDTO.getNameOfSubject());
+				}
+				if (subjectDTO.getWeeklyHours() != null) {
+					subjectEntity.setWeeklyHours(subjectDTO.getWeeklyHours());
+				}
+				if (subjectDTO.getSemester() != null) {
+					subjectEntity.setSemester(subjectDTO.getSemester());
+				}
+				if (subjectDTO.getSubjectForYear() != null) {
+					subjectEntity.setSubjectForYear(subjectDTO.getSubjectForYear());
+				}
+				
+				subjectRepository.save(subjectEntity);
+				logger.info("Updated subject with id number " + id);
+				return new ResponseEntity<SubjectEntity>(subjectEntity, HttpStatus.OK);
+			} else {
+				return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.BAD_REQUEST.value(), "Subject with name "
+					+ subjectEntity.getNameOfSubject() + " for year " + subjectEntity.getSubjectForYear() + " already exists."), HttpStatus.BAD_REQUEST);
+			}
 		}
 		return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + id + " not found"), HttpStatus.NOT_FOUND);
 	}

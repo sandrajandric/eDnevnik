@@ -2,10 +2,10 @@ package com.iktakademija.ednevnik.services;
 
 import java.util.List;
 
+import com.iktakademija.ednevnik.entities.GradeEntity;
+
 public interface GradeService {
 
-	List<?> findAllGradesByStudent(Integer studentId);
+	Long existsTeacherSubjectStudent(Integer teacherId, Integer subjectId, Integer studentId); 
 	
-	List<?> findAllGradesByTeacherSubjectStudent(Integer studentId, Integer teacherId, Integer subjectId);
-
 }

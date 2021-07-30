@@ -30,7 +30,7 @@ public class StudentEntity extends UserEntity {
 	private ParentEntity parent;
 	
 	@JsonView(Views.Private.class)
-	@JsonManagedReference(value = "pc")
+	@JsonBackReference(value = "pc")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "classs")
 	private ClassEntity classs;
@@ -38,14 +38,14 @@ public class StudentEntity extends UserEntity {
 	@JsonView(Views.Private.class)
 	@JsonBackReference(value = "tspp")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "student")
-	private List<Grade> listens = new ArrayList<>();
+	private List<GradeEntity> listens = new ArrayList<>();
 
 	public StudentEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public StudentEntity(ParentEntity parent, ClassEntity classs, List<Grade> listens) {
+	public StudentEntity(ParentEntity parent, ClassEntity classs, List<GradeEntity> listens) {
 		super();
 		this.parent = parent;
 		this.classs = classs;
@@ -68,11 +68,11 @@ public class StudentEntity extends UserEntity {
 		this.classs = classs;
 	}
 
-	public List<Grade> getListens() {
+	public List<GradeEntity> getListens() {
 		return listens;
 	}
 
-	public void setListens(List<Grade> listens) {
+	public void setListens(List<GradeEntity> listens) {
 		this.listens = listens;
 	}
 	

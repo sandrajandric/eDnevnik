@@ -35,7 +35,7 @@ import com.iktakademija.ednevnik.util.Encryption;
 @RequestMapping(value = "/api/v1/teachers")
 @Secured("ROLE_ADMIN")
 public class TeacherController {
-	
+
 	private final Logger logger = (Logger) LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
@@ -46,10 +46,10 @@ public class TeacherController {
 
 	@Autowired
 	private TeacherSubjectRepository teacherSubjectRepository;
-	
+
 	@Autowired
 	private RoleRepository roleRepository;
-	
+
 	private Encryption encryption;
 
 	private String createErrorMessage(BindingResult result) {
@@ -90,7 +90,7 @@ public class TeacherController {
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 		}
-		
+
 		RoleEntity role = roleRepository.findById(1).get();
 		TeacherEntity newTeacher = new TeacherEntity();
 		newTeacher.setName(userDTO.getName());
@@ -170,22 +170,25 @@ public class TeacherController {
 				teacherSubject.setTeacher(teacher);
 				listTeacherSubject.add(teacherSubject);
 				subject.setHasTeachers(listTeacherSubject);
-				
+
 			} else {
-				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.BAD_REQUEST.value(),
-						"Subject with id number " + subjectId + " is already assigned to teacher with id number " + teacherId), HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<RESTError>(
+						new RESTError(HttpStatus.BAD_REQUEST.value(),
+								"Subject with id number " + subjectId
+										+ " is already assigned to teacher with id number " + teacherId),
+						HttpStatus.BAD_REQUEST);
 			}
-			
+
 			teacherSubjectRepository.save(teacherSubject);
 			logger.info("Subject with id number " + subjectId + " added to teacher with id number " + teacherId);
 			return new ResponseEntity<TeacherSubjectEntity>(teacherSubject, HttpStatus.OK);
 		} else {
-			if (!subjectRepository.existsById(subjectId)) {
-				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(),
-						"Subject with id number " + subjectId + " not found"), HttpStatus.NOT_FOUND);
-			} else {
+			if (!teacherRepository.existsById(teacherId)) {
 				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(),
 						"Teacher with id number " + teacherId + " not found"), HttpStatus.NOT_FOUND);
+			} else {
+				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(),
+						"Subject with id number " + subjectId + " not found"), HttpStatus.NOT_FOUND);
 			}
 		}
 	}
@@ -194,15 +197,25 @@ public class TeacherController {
 	@RequestMapping(method = RequestMethod.PUT, value = "/{teacherId}/removeSubjectFromTeacher/{subjectId}")
 	public ResponseEntity<?> removeSubjectsFromTeacher(@PathVariable Integer teacherId,
 			@PathVariable Integer subjectId) {
-		if (teacherSubjectRepository.existsSubjectIdAndTeacherId(subjectId, teacherId) >= 1) {
-			teacherSubjectRepository.removeSubjectFromTeacher(subjectId, teacherId);
-			logger.info("Subject with id number " + subjectId + " removed from teacher with id number " + teacherId);
-			return new ResponseEntity<TeacherSubjectEntity>( HttpStatus.OK);
+		if (teacherRepository.existsById(teacherId) && subjectRepository.existsById(subjectId)) {
+			if (teacherSubjectRepository.existsSubjectIdAndTeacherId(subjectId, teacherId) >= 1) {
+				teacherSubjectRepository.removeSubjectFromTeacher(subjectId, teacherId);
+				logger.info("Subject with id number " + subjectId + " removed from teacher with id number " + teacherId);
+				return new ResponseEntity<TeacherSubjectEntity>(HttpStatus.OK);
+			} else {
+				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(),
+						"Subject with id number " + subjectId + " is not assigned to teacher " + teacherId),
+						HttpStatus.NOT_FOUND);
+			}
 		} else {
-			return new ResponseEntity<RESTError>(
-					new RESTError(HttpStatus.NOT_FOUND.value(),
-							"Subject with id number " + subjectId + " is not assigned to teacher " + teacherId),
-					HttpStatus.NOT_FOUND);
+			if (!teacherRepository.existsById(teacherId)) {
+				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(),
+						"Teacher with id number " + teacherId + " not found"), HttpStatus.NOT_FOUND);
+			} else {
+				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(),
+						"Subject with id number " + subjectId + " not found"), HttpStatus.NOT_FOUND);
+			}
 		}
+
 	}
 }

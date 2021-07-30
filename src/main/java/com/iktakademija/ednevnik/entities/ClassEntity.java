@@ -50,11 +50,11 @@ public class ClassEntity {
 	private EYear year;
 	
 	@JsonView(Views.Private.class)
-	@JsonBackReference(value = "pc")
+	@JsonManagedReference(value = "pc")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "classs")
 	private List<StudentEntity> students = new ArrayList<>();
 	
-	@JsonBackReference(value = "tc")
+	@JsonManagedReference(value = "tc")
 	@OneToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "inChargeOfClass")
 	private TeacherEntity homeroomTeacher;
 	

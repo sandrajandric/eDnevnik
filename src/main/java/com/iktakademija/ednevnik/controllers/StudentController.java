@@ -169,10 +169,10 @@ public class StudentController {
 				logger.info("Student with id number " + studentId + " added to parent with id number " + parentId);
 				return new ResponseEntity<ParentEntity>(parent, HttpStatus.OK);
 			} else {
-				if (!parentRepository.existsById(parentId)) {
-					return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Parent with id number " + parentId + " not found"), HttpStatus.NOT_FOUND);
-				} else {
+				if (!studentRepository.existsById(studentId)) {
 					return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Student with id number " + studentId + " not found"), HttpStatus.NOT_FOUND);
+				} else {
+					return new  ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Parent with id number " + parentId + " not found"), HttpStatus.NOT_FOUND);
 				}
 			}
 		}

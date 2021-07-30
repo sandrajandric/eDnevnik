@@ -60,7 +60,7 @@ public class SubjectEntity {
 	@Enumerated(EnumType.STRING)
 	private EYear subjectForYear;
 	
-	@JsonBackReference(value = "tss")
+	@JsonManagedReference(value = "tss")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "subject")
 	private List<TeacherSubjectEntity> hasTeachers = new ArrayList<>();
 	

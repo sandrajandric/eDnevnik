@@ -32,19 +32,8 @@ public class TeacherSubjectStudentServiceImpl implements TeacherSubjectStudentSe
 		return result;
 	}
 
-	@Override
-	public List<?> findGradesForSubjectOfTeacher(Integer teacherId, Integer subjectId) {
-		String sql = "SELECT t FROM TeacherSubjectStudentEntity t INNER JOIN t.teacherSubject s"
-				+ " WHERE s.teacher.id = :teacherId AND s.subject.id = :subjectId";
-		Query query = em.createQuery(sql);
-
-		query.setParameter("teacherId", teacherId);
-		query.setParameter("subjectId", subjectId);
-
-		List<TeacherSubjectStudentEntity> result = query.getResultList();
-
-		return result;
-	}
-
+	
+	
+	
 	
 }

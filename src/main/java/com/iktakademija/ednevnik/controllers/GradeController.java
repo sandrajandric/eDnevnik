@@ -1,14 +1,10 @@
 package com.iktakademija.ednevnik.controllers;
 
-import java.net.http.HttpRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.persistence.Convert;
-import javax.servlet.http.HttpSessionContext;
-import javax.sound.sampled.AudioFormat.Encoding;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -44,7 +40,6 @@ import com.iktakademija.ednevnik.repositories.UserRepository;
 import com.iktakademija.ednevnik.services.EmailService;
 import com.iktakademija.ednevnik.services.GradeService;
 import com.iktakademija.ednevnik.services.TeacherSubjectStudentService;
-import com.iktakademija.ednevnik.services.TeacherSubjectStudentServiceImpl;
 import com.iktakademija.ednevnik.services.UserService;
 import com.iktakademija.ednevnik.services.dto.EmailObject;
 
@@ -259,52 +254,69 @@ public class GradeController {
 	}
 
 	// lista svih ocena i predmeta kojima predaje nastavnik
-	@RequestMapping(method = RequestMethod.GET, value = "/getAllGradesForSubject/{subjectId}")
+	@RequestMapping(method = RequestMethod.GET, value = "/{teacherId}/getAllGradesForStudent/{studentId}/forSubject/{subjectId}")
 	@Secured({"ROLE_TEACHER", "ROLE_ADMIN"})
-	public ResponseEntity<?> getAllGradesForSubject(@PathVariable Integer subjectId) {
+	public ResponseEntity<?> getAllGradesForSubject(@PathVariable Integer teacherId, @PathVariable Integer subjectId, @PathVariable Integer studentId) {
 
 		String username = userService.getLoggedUser();
 		
 		UserEntity user = userRepository.findById(1).get();
-		UserEntity teacher = userRepository.findByUsername(username);
+		TeacherEntity teacher = teacherRepository.findById(teacherId).get();
 		
-		if (subjectRepository.existsById(subjectId)) {
-			if (username.equals(teacher.getUsername()) || username.equals(user.getUsername())) {
-				if (subjectRepository.existsById(subjectId)) {
-					if (userRepository.existsByUsername(username)) {
-						if (teacherSubjectRepository.existsSubjectIdAndTeacherId(subjectId, teacher.getId()) >= 1) {
-							List<GradeEntity> grades = new ArrayList<>();
-							grades = (List<GradeEntity>) tesubSubjectStudentService.findGradesForSubjectOfTeacher(subjectId, teacher.getId());
-							if (!grades.isEmpty()) {
-								logger.info("Viewed all grades for subject with id " + subjectId);
-								return new ResponseEntity<List<GradeEntity>>(grades, HttpStatus.OK);
+		if (studentRepository.existsById(studentId)) {
+			if (subjectRepository.existsById(subjectId)) {
+				if (username.equals(teacher.getUsername()) || username.equals(user.getUsername())) {
+					if (subjectRepository.existsById(subjectId)) {
+						if (teacherRepository.existsById(teacherId)) {
+							if (teacherSubjectRepository.existsSubjectIdAndTeacherId(subjectId, teacherId) >= 1) {
+								if (tesubSubjectStudentService.existsTeacherSubjectStudent(teacherId, subjectId,
+										studentId) >= 1) {
+								} else {
+									return new ResponseEntity<RESTError>(
+											new RESTError(HttpStatus.NOT_FOUND.value(), "Student with id number " + studentId
+															+ " is not listening to subject with id number " + subjectId
+															+ " and teacher with id number " + teacherId),
+											HttpStatus.NOT_FOUND);
+								}
+								List<GradeEntity> grades = new ArrayList<>();
+								grades = (List<GradeEntity>) gradeService.findAllGradesByTeacherSubjectStudent(subjectId, teacherId, studentId);
+								if (!grades.isEmpty()) {
+									logger.info("Viewed all grades for subject with id " + subjectId);
+									return new ResponseEntity<List<GradeEntity>>(grades, HttpStatus.OK);
+								} else {
+									return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Grades not found")
+											, HttpStatus.NOT_FOUND);
+								}
 							} else {
-								return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Grades not found")
-										, HttpStatus.NOT_FOUND);
+								return new ResponseEntity<RESTError>(
+										new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + subjectId
+											+ " is not assigned to teacher with id number " + teacher.getId()), HttpStatus.NOT_FOUND);
 							}
 						} else {
-							return new ResponseEntity<RESTError>(
-									new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + subjectId
-										+ " is not assigned to teacher with id number " + teacher.getId()), HttpStatus.NOT_FOUND);
+							return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Teacher not found"),
+									HttpStatus.NOT_FOUND);
 						}
 					} else {
-						return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Teacher not found"),
+						return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + subjectId + " not found"),
 								HttpStatus.NOT_FOUND);
 					}
+					
+					
 				} else {
-					return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + subjectId + " not found"),
-							HttpStatus.NOT_FOUND);
+					return new ResponseEntity<RESTError>(new RESTError(HttpStatus.UNAUTHORIZED.value(), "You are unauthorized to view grades for subject with id number " + subjectId ),
+							HttpStatus.UNAUTHORIZED);
 				}
 				
-				
 			} else {
-				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.UNAUTHORIZED.value(), "You are unauthorized to view grades of student with id number " ),
-						HttpStatus.UNAUTHORIZED);
+				return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + subjectId + " not found"),
+						HttpStatus.NOT_FOUND);
 			}
 			
 		} else {
-			return new ResponseEntity<RESTError>(new RESTError(HttpStatus.NOT_FOUND.value(), "Subject with id number " + subjectId + " not found"),
+			return new ResponseEntity<RESTError>(
+					new RESTError(HttpStatus.NOT_FOUND.value(), "Student with id number " + studentId + " not found"),
 					HttpStatus.NOT_FOUND);
 		}
+		
 	}
 }

@@ -8,7 +8,7 @@ import javax.persistence.Query;
 
 import org.springframework.stereotype.Service;
 
-import com.iktakademija.ednevnik.entities.TeacherSubjectStudentEntity;
+import com.iktakademija.ednevnik.entities.Grade;
 
 @Service
 public class TeacherSubjectStudentServiceImpl implements TeacherSubjectStudentService {

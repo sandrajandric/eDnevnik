@@ -20,6 +20,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -59,8 +60,7 @@ public class SubjectEntity {
 	@Enumerated(EnumType.STRING)
 	private EYear subjectForYear;
 	
-	@JsonIgnore
-	@JsonManagedReference(value = "tss")
+	@JsonBackReference(value = "tss")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "subject")
 	private List<TeacherSubjectEntity> hasTeachers = new ArrayList<>();
 	

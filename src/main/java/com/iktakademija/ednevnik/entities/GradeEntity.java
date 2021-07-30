@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -47,8 +48,8 @@ public class GradeEntity {
 	
 	@JsonManagedReference(value = "gtsp")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
-	@JoinColumn(name = "teacherSubjectStudent")
-	private TeacherSubjectStudentEntity teacherSubjectStudent;
+	@JoinColumn(name = "hasGrades")
+	private Grade hasGrades;
 		
 	@JsonView(Views.Admin.class)
 	@Version
@@ -58,19 +59,20 @@ public class GradeEntity {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	public GradeEntity(Integer id,
 			@NotNull(message = "Grade type must not be null. Accepted values are: TEST, ORAL, CLASS_ACTIVITY") EGradeType gradeType,
 			@Range(min = 1, max = 5) @NotNull(message = "Grade must not be left blank. Accepted values are between {min} and {max}.") Integer grade,
-			LocalDate date, TeacherSubjectStudentEntity teacherSubjectStudent) {
+			LocalDate date, Grade hasGrades) {
 		super();
 		this.id = id;
 		this.gradeType = gradeType;
 		this.grade = grade;
 		this.date = date;
-		this.teacherSubjectStudent = teacherSubjectStudent;
+		this.hasGrades = hasGrades;
 	}
 
+	
 
 
 	public Integer getId() {
@@ -105,21 +107,21 @@ public class GradeEntity {
 		this.date = date;
 	}
 
-	public TeacherSubjectStudentEntity getTeacherSubjectStudent() {
-		return teacherSubjectStudent;
+	public Grade getHasGrades() {
+		return hasGrades;
 	}
 
-	public void setTeacherSubjectStudent(TeacherSubjectStudentEntity teacherSubjectStudent) {
-		this.teacherSubjectStudent = teacherSubjectStudent;
+	public void setHasGrades(Grade hasGrades) {
+		this.hasGrades = hasGrades;
 	}
 
 	@Override
 	public String toString() {
 		return "GradeType: " + getGradeType() + "\nGrade: " + getGrade() + "\nDate: " + getDate() +
-			"\nStudent: " + getTeacherSubjectStudent().getStudent().getName() + " " +
-			getTeacherSubjectStudent().getStudent().getSurname() + "\nTeacher: " + getTeacherSubjectStudent().getTeacherSubject().getTeacher().getName()
-			+ " " + getTeacherSubjectStudent().getTeacherSubject().getTeacher().getSurname() + "\nSubject: "
-			+ getTeacherSubjectStudent().getTeacherSubject().getSubject().getNameOfSubject();
+			"\nStudent: " + getHasGrades().getStudent().getName() + " " +
+			getHasGrades().getStudent().getSurname() + "\nTeacher: " + getHasGrades().getTeacherSubject().getTeacher().getName()
+			+ " " + getHasGrades().getTeacherSubject().getTeacher().getSurname() + "\nSubject: "
+			+ getHasGrades().getTeacherSubject().getSubject().getNameOfSubject();
 	}
 	
 }

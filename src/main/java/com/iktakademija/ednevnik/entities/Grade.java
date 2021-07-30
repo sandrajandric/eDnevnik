@@ -14,14 +14,16 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.iktakademija.ednevnik.security.Views;
 
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 @Entity
 @Table(name = "teacher_subject_student")
-public class TeacherSubjectStudentEntity {
+public class Grade {
 
 	@JsonView(Views.Admin.class)
 	@Id
@@ -29,7 +31,7 @@ public class TeacherSubjectStudentEntity {
 	private Integer id;
 
 	@JsonView(Views.Private.class)
-	@JsonBackReference(value = "tspp")
+	@JsonManagedReference(value = "tspp")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "student")
 	private StudentEntity student;
@@ -39,17 +41,18 @@ public class TeacherSubjectStudentEntity {
 	@JoinColumn(name = "teacherSubject")
 	private TeacherSubjectEntity teacherSubject;
 	
+
 	@JsonView(Views.Private.class)
 	@JsonBackReference(value = "gtsp")
-	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "teacherSubjectStudent")
+	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "hasGrades")
 	private List<GradeEntity> grades = new ArrayList<>();
 
-	public TeacherSubjectStudentEntity() {
+	public Grade() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public TeacherSubjectStudentEntity(Integer id, StudentEntity student, TeacherSubjectEntity teacherSubject,
+	public Grade(Integer id, StudentEntity student, TeacherSubjectEntity teacherSubject,
 			List<GradeEntity> grades) {
 		super();
 		this.id = id;

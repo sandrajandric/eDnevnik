@@ -12,6 +12,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -22,12 +23,11 @@ import com.iktakademija.ednevnik.security.Views;
 @Table(name = "teacher")
 public class TeacherEntity extends UserEntity {
 
-	@JsonView(Views.Private.class)
-	@JsonManagedReference(value = "tst")
+	@JsonBackReference(value = "tst")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "teacher")
 	private List<TeacherSubjectEntity> teaches = new ArrayList<>();
 	
-	@JsonBackReference(value = "tc")
+	@JsonManagedReference(value = "tc")
 	@OneToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "inChargeOfClass")
 	private ClassEntity inChargeOfClass;

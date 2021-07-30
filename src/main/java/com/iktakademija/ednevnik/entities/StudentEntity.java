@@ -12,6 +12,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -29,22 +30,22 @@ public class StudentEntity extends UserEntity {
 	private ParentEntity parent;
 	
 	@JsonView(Views.Private.class)
-	@JsonBackReference(value = "pc")
+	@JsonManagedReference(value = "pc")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "classs")
 	private ClassEntity classs;
 	
 	@JsonView(Views.Private.class)
-	@JsonManagedReference(value = "tspp")
+	@JsonBackReference(value = "tspp")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "student")
-	private List<TeacherSubjectStudentEntity> listens = new ArrayList<>();
+	private List<Grade> listens = new ArrayList<>();
 
 	public StudentEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public StudentEntity(ParentEntity parent, ClassEntity classs, List<TeacherSubjectStudentEntity> listens) {
+	public StudentEntity(ParentEntity parent, ClassEntity classs, List<Grade> listens) {
 		super();
 		this.parent = parent;
 		this.classs = classs;
@@ -67,11 +68,11 @@ public class StudentEntity extends UserEntity {
 		this.classs = classs;
 	}
 
-	public List<TeacherSubjectStudentEntity> getListens() {
+	public List<Grade> getListens() {
 		return listens;
 	}
 
-	public void setListens(List<TeacherSubjectStudentEntity> listens) {
+	public void setListens(List<Grade> listens) {
 		this.listens = listens;
 	}
 	

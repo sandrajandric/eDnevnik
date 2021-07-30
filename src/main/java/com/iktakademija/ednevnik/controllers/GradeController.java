@@ -27,7 +27,7 @@ import com.iktakademija.ednevnik.entities.StudentEntity;
 import com.iktakademija.ednevnik.entities.SubjectEntity;
 import com.iktakademija.ednevnik.entities.TeacherEntity;
 import com.iktakademija.ednevnik.entities.TeacherSubjectEntity;
-import com.iktakademija.ednevnik.entities.TeacherSubjectStudentEntity;
+import com.iktakademija.ednevnik.entities.Grade;
 import com.iktakademija.ednevnik.entities.UserEntity;
 import com.iktakademija.ednevnik.entities.dto.GradeDTO;
 import com.iktakademija.ednevnik.repositories.GradeRepository;
@@ -130,7 +130,7 @@ public class GradeController {
 		StudentEntity student = studentRepository.findById(studentId).get();
 		TeacherSubjectEntity teacherSubject = teacherSubjectRepository.findBySubjectIdAndTeacherId(subjectId,
 				teacherId);
-		TeacherSubjectStudentEntity tsse = new TeacherSubjectStudentEntity();
+		Grade tsse = new Grade();
 
 		if (studentRepository.existsById(studentId)) {
 			if (teacherRepository.existsById(teacherId)) {
@@ -144,7 +144,7 @@ public class GradeController {
 								newGrade.setGrade(gradeDTO.getGrade());
 								newGrade.setGradeType(gradeDTO.getGradeType());
 								newGrade.setDate(LocalDate.now());
-								newGrade.setTeacherSubjectStudent(tsse);
+								newGrade.setHasGrades(tsse);
 
 								teacherSubjectStudentRepository.save(tsse);
 								gradeRepository.save(newGrade);

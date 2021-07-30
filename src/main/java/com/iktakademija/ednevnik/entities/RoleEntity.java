@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -28,7 +30,7 @@ public class RoleEntity {
 	@Column(name = "role_name")
 	private String name;
 	
-	@JsonManagedReference(value = "ru")
+	@JsonBackReference(value = "ru")
 	@OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
 	private List<UserEntity> users = new ArrayList<>();
 

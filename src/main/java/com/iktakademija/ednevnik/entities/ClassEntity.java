@@ -19,6 +19,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -49,11 +50,11 @@ public class ClassEntity {
 	private EYear year;
 	
 	@JsonView(Views.Private.class)
-	@JsonManagedReference(value = "pc")
+	@JsonBackReference(value = "pc")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "classs")
 	private List<StudentEntity> students = new ArrayList<>();
 	
-	@JsonManagedReference(value = "tc")
+	@JsonBackReference(value = "tc")
 	@OneToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "inChargeOfClass")
 	private TeacherEntity homeroomTeacher;
 	

@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -30,20 +31,20 @@ public class TeacherSubjectEntity {
 	private Integer id;
 	
 	@JsonView(Views.Private.class)
-	@JsonBackReference(value = "tst")
+	@JsonManagedReference(value = "tst")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "teacher")
 	private TeacherEntity teacher;
 	
 	@JsonView(Views.Private.class)
-	@JsonBackReference(value = "tss")
+	@JsonManagedReference(value = "tss")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "subject")
 	private SubjectEntity subject;
 	
 	@JsonManagedReference(value = "tse")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "teacherSubject")
-	private List<TeacherSubjectStudentEntity> teacherSubjectStudent = new ArrayList<>();
+	private List<Grade> teacherSubjectStudent = new ArrayList<>();
 
 	public TeacherSubjectEntity() {
 		super();
@@ -51,7 +52,7 @@ public class TeacherSubjectEntity {
 	}
 
 	public TeacherSubjectEntity(Integer id, TeacherEntity teacher, SubjectEntity subject,
-			List<TeacherSubjectStudentEntity> teacherSubjectStudent) {
+			List<Grade> teacherSubjectStudent) {
 		super();
 		this.id = id;
 		this.teacher = teacher;
@@ -83,11 +84,11 @@ public class TeacherSubjectEntity {
 		this.subject = subject;
 	}
 
-	public List<TeacherSubjectStudentEntity> getTeacherSubjectStudent() {
+	public List<Grade> getTeacherSubjectStudent() {
 		return teacherSubjectStudent;
 	}
 
-	public void setTeacherSubjectStudent(List<TeacherSubjectStudentEntity> teacherSubjectStudent) {
+	public void setTeacherSubjectStudent(List<Grade> teacherSubjectStudent) {
 		this.teacherSubjectStudent = teacherSubjectStudent;
 	}
 

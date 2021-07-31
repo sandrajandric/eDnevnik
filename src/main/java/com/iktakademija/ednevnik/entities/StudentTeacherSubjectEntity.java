@@ -90,6 +90,10 @@ public class StudentTeacherSubjectEntity {
 		this.grades = grades;
 	}
 
-	
+	@Override
+	public String toString() {
+		return "Student: " + getStudentt().getName() + " " + getStudentt().getSurname() + 
+				"Teacher: " + getSubjectt().getTeacher().getName() + " " + getSubjectt().getTeacher().getSurname();
+	}
 	
 }

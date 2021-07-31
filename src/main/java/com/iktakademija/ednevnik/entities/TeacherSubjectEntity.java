@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -25,18 +26,15 @@ import com.iktakademija.ednevnik.security.Views;
 @Table(name = "teacher_subject")
 public class TeacherSubjectEntity {
 	
-	@JsonView(Views.Admin.class)
 	@Id
 	@GeneratedValue
 	private Integer id;
 	
-	@JsonView(Views.Private.class)
 	@JsonManagedReference(value = "tst")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "teacher")
 	private TeacherEntity teacher;
 	
-	@JsonView(Views.Private.class)
 	@JsonBackReference(value = "tss")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "subject")
@@ -47,6 +45,8 @@ public class TeacherSubjectEntity {
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "subjectt")
 	private List<StudentTeacherSubjectEntity> subjects = new ArrayList<>();
 	
+	@Version
+	private Integer version;
 
 	public TeacherSubjectEntity() {
 		super();
@@ -103,7 +103,11 @@ public class TeacherSubjectEntity {
 		this.subjects = subjects;
 	}
 
-	
+	@Override
+	public String toString() {
+		return "Teacher: " + getTeacher().getName() + " " + getTeacher().getSurname() +
+				"Subject: " + getSubject().getNameOfSubject();
+	}
 	
 	
 }

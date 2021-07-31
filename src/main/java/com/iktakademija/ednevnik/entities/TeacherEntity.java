@@ -53,5 +53,9 @@ public class TeacherEntity extends UserEntity {
 		this.inChargeOfClass = inChargeOfClass;
 	}
 
-	
+	@Override
+	public String toString() {
+		return super.toString() + ", InChargeOfClass: " +
+				getInChargeOfClass().getYear() + " " + getInChargeOfClass().getClassNumber();
+	}
 }

@@ -20,7 +20,6 @@ import com.iktakademija.ednevnik.security.Views;
 @Table(name = "parent")
 public class ParentEntity extends UserEntity {
 
-	@JsonView(Views.Private.class)
 	@JsonManagedReference(value = "pp")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "parent")
 	private List<StudentEntity> students = new ArrayList<>();

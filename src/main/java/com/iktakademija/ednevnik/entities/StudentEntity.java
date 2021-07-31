@@ -24,19 +24,15 @@ import com.iktakademija.ednevnik.security.Views;
 @Table(name = "student")
 public class StudentEntity extends UserEntity {
 
-	@JsonView(Views.Private.class)
 	@JsonBackReference(value = "pp")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent")
 	private ParentEntity parent;
 	
-	@JsonView(Views.Private.class)
 	@JsonBackReference(value = "pc")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "classs")
 	private ClassEntity classs;
-	
-	
 	
 	@JsonBackReference(value = "stsu")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "studentt")
@@ -86,7 +82,11 @@ public class StudentEntity extends UserEntity {
 		this.students = students;
 	}
 
-	
+	@Override
+	public String toString() {
+		return super.toString() + ", Parent: " + getParent().getName() + " " +
+				getParent().getSurname() + ", Class: " + getClasss().getYear() + " " + getClasss().getClassNumber();
+	}
 	
 	
 }

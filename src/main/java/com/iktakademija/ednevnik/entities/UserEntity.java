@@ -27,46 +27,38 @@ import com.iktakademija.ednevnik.security.Views;
 @Table(name = "user")
 public class UserEntity {
 
-	@JsonView(Views.Admin.class)
 	@Id
 	@GeneratedValue
 	@Column(name = "user_id")
 	private Integer id;
 	
-	@JsonView(Views.Private.class)
 	@Column(nullable = false)
 	@NotBlank(message = "First name must not be left blank.")
 	private String name;
 	
-	@JsonView(Views.Private.class)
 	@Column(nullable = false)
 	@NotBlank(message = "Last name must not be left blank.")
 	private String surname;
 	
-	@JsonView(Views.Private.class)
 	@Column(nullable = false, unique = true)
 	@Email(message = "Email is not valid.")
 	private String email;
 	
-	@JsonView(Views.Public.class)
 	@Column(nullable = false, unique = true)
 	@NotBlank(message = "Username must not be left blank.")
 	@Size(min = 5, max = 600, message = "Username must be between {min} and {max} characters long.")
 	private String username;
 	
-	@JsonView(Views.Public.class)
 	@JsonIgnore
 	@Column(nullable = false)
 	@NotBlank(message = "Password must not be left blank.")
 	private String password;
 	
-	@JsonView(Views.Admin.class)
 	@JsonManagedReference(value = "ru")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "role")
 	private RoleEntity role;
 	
-	@JsonView(Views.Admin.class)
 	@Version
 	private Integer version;
 
@@ -136,6 +128,7 @@ public class UserEntity {
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return "Role: " + getRole()	+ ", Name: " + getName() + ", Surname: " + getSurname();
+		return "Role: " + getRole()	+ ", Name: " + getName() + ", Surname: " + getSurname()
+			+ ", Username: " + getUsername() + ", Email: " + getEmail();
 	}
 }

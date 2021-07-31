@@ -32,24 +32,20 @@ import com.iktakademija.ednevnik.security.Views;
 @Table(name = "class")
 public class ClassEntity {
 
-	@JsonView(Views.Admin.class)
 	@Id
 	@GeneratedValue
 	@Column(name = "class_id")
 	private Integer id;
 	
-	@JsonView(Views.Private.class)
 	@Column(nullable = false)
 	@NotNull(message = "Class number must not be null. Class number must be between {min} and {max}")
 	@Min(value = 1)
 	@Max(value = 9)
 	private Integer classNumber;
 	
-	@JsonView(Views.Private.class)
 	@Enumerated(EnumType.STRING)
 	private EYear year;
 	
-	@JsonView(Views.Private.class)
 	@JsonManagedReference(value = "pc")
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "classs")
 	private List<StudentEntity> students = new ArrayList<>();
@@ -58,7 +54,6 @@ public class ClassEntity {
 	@OneToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "inChargeOfClass")
 	private TeacherEntity homeroomTeacher;
 	
-	@JsonView(Views.Admin.class)
 	@Version
 	private Integer version;
 
@@ -108,6 +103,7 @@ public class ClassEntity {
 	
 	@Override
 	public String toString() {
-		return "Year: " + getYear() + ", ClassNumber: " + getClassNumber();
+		return "Year: " + getYear() + ", ClassNumber: " + getClassNumber() + ", HomeroomTeacher: " + getHomeroomTeacher().getName()
+				+ " " + getHomeroomTeacher().getSurname();
 	}
 }

@@ -34,29 +34,24 @@ import com.iktakademija.ednevnik.security.Views;
 @Table(name = "subject")
 public class SubjectEntity {
 
-	@JsonView(Views.Admin.class)
 	@Id
 	@GeneratedValue
 	@Column(name = "subject_id")
 	private Integer id;
 	
-	@JsonView(Views.Private.class)
 	@Column(nullable = false)
 	@NotBlank(message = "Subject name must not be left blank.")
 	@Size(min = 2, max = 30, message = "Subject name must be between {min} and {max} characters long.")
 	private String nameOfSubject;
 	
-	@JsonView(Views.Private.class)
 	@NotNull(message = "Weekly hours must not be left blank. Weekly hours must be between {min} and {max}.")
 	@Min(value = 0)
 	@Max(value = 40)
 	private Integer weeklyHours;
 	
-	@JsonView(Views.Private.class)
 	@Enumerated(EnumType.STRING)
 	private ESemester semester;
 	
-	@JsonView(Views.Private.class)
 	@Enumerated(EnumType.STRING)
 	private EYear subjectForYear;
 	
@@ -64,9 +59,6 @@ public class SubjectEntity {
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "subject")
 	private List<TeacherSubjectEntity> hasTeachers = new ArrayList<>();
 	
-	
-	
-	@JsonView(Views.Admin.class)
 	@Version
 	private Integer version;
 	
@@ -89,9 +81,6 @@ public class SubjectEntity {
 		this.subjectForYear = subjectForYear;
 		this.hasTeachers = hasTeachers;
 	}
-
-	
-
 
 
 	public Integer getId() {
@@ -156,6 +145,7 @@ public class SubjectEntity {
 
 	@Override
 	public String toString() {
-		return "NameOfSubject: " + getNameOfSubject() + ", Year: " + getSubjectForYear();
+		return "NameOfSubject: " + getNameOfSubject() + ", Year: " + getSubjectForYear() +
+				"Semester: " + getSemester() + "Weekly hours: " + getWeeklyHours();
 	}
 }

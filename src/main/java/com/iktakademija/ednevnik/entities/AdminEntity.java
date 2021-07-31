@@ -10,4 +10,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Table(name = "admin")
 public class AdminEntity extends UserEntity {
 
+	@Override
+	public String toString() {
+		return super.toString();
+	}
 }

@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -33,6 +34,9 @@ public class RoleEntity {
 	@JsonBackReference(value = "ru")
 	@OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
 	private List<UserEntity> users = new ArrayList<>();
+	
+	@Version
+	private Integer version;
 
 	public RoleEntity() {
 		super();
@@ -70,6 +74,9 @@ public class RoleEntity {
 		this.users = users;
 	}
 
-	
+	@Override
+	public String toString() {
+		return "Role name: " + getName();
+	}
 	
 }

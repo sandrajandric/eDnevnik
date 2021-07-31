@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +68,7 @@ public class SubjectController {
 	
 	// dodaj novi predmet
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<?> createSubject(@RequestBody SubjectDTO subjectDTO,
+	public ResponseEntity<?> createSubject(@Valid @RequestBody SubjectDTO subjectDTO,
 			 BindingResult result) {
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
@@ -86,7 +88,7 @@ public class SubjectController {
 	// izmeni predmet
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
 	public ResponseEntity<?> updateSubject(@PathVariable Integer id, 
-			@RequestBody SubjectDTOPut subjectDTO, BindingResult result) {
+			@Valid @RequestBody SubjectDTOPut subjectDTO, BindingResult result) {
 		
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +88,7 @@ public class TeacherController {
 
 	// dodaj novog nastavnika
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<?> createTeacher(@RequestBody UserDTO userDTO, BindingResult result) {
+	public ResponseEntity<?> createTeacher(@Valid @RequestBody UserDTO userDTO, BindingResult result) {
 		if (result.hasErrors()) {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 		}
@@ -107,7 +109,7 @@ public class TeacherController {
 
 	// izmeni nastavnika
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-	public ResponseEntity<?> updateTeacher(@PathVariable Integer id, @RequestBody UserDTOPut userDTO,
+	public ResponseEntity<?> updateTeacher(@PathVariable Integer id, @Valid @RequestBody UserDTOPut userDTO,
 			BindingResult result) {
 
 		if (result.hasErrors()) {

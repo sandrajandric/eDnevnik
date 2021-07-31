@@ -64,6 +64,8 @@ public class SubjectEntity {
 	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "subject")
 	private List<TeacherSubjectEntity> hasTeachers = new ArrayList<>();
 	
+	
+	
 	@JsonView(Views.Admin.class)
 	@Version
 	private Integer version;
@@ -74,43 +76,71 @@ public class SubjectEntity {
 		// TODO Auto-generated constructor stub
 	}
 
-	public SubjectEntity(Integer id, String nameOfSubject, Integer weeklyHours) {
+
+	public SubjectEntity(Integer id,
+			@NotBlank(message = "Subject name must not be left blank.") @Size(min = 2, max = 30, message = "Subject name must be between {min} and {max} characters long.") String nameOfSubject,
+			@NotNull(message = "Weekly hours must not be left blank. Weekly hours must be between {min} and {max}.") @Min(0) @Max(40) Integer weeklyHours,
+			ESemester semester, EYear subjectForYear, List<TeacherSubjectEntity> hasTeachers) {
 		super();
 		this.id = id;
 		this.nameOfSubject = nameOfSubject;
 		this.weeklyHours = weeklyHours;
+		this.semester = semester;
+		this.subjectForYear = subjectForYear;
+		this.hasTeachers = hasTeachers;
 	}
+
+	
+
+
 
 	public Integer getId() {
 		return id;
 	}
 
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
 
 	public String getNameOfSubject() {
 		return nameOfSubject;
 	}
 
+
 	public void setNameOfSubject(String nameOfSubject) {
 		this.nameOfSubject = nameOfSubject;
 	}
+
 
 	public Integer getWeeklyHours() {
 		return weeklyHours;
 	}
 
+
 	public void setWeeklyHours(Integer weeklyHours) {
 		this.weeklyHours = weeklyHours;
 	}
+
 
 	public ESemester getSemester() {
 		return semester;
 	}
 
+
 	public void setSemester(ESemester semester) {
 		this.semester = semester;
+	}
+
+
+	public EYear getSubjectForYear() {
+		return subjectForYear;
+	}
+
+
+	public void setSubjectForYear(EYear subjectForYear) {
+		this.subjectForYear = subjectForYear;
 	}
 
 
@@ -118,18 +148,12 @@ public class SubjectEntity {
 		return hasTeachers;
 	}
 
+
 	public void setHasTeachers(List<TeacherSubjectEntity> hasTeachers) {
 		this.hasTeachers = hasTeachers;
 	}
 
-	public EYear getSubjectForYear() {
-		return subjectForYear;
-	}
 
-	public void setSubjectForYear(EYear subjectForYear) {
-		this.subjectForYear = subjectForYear;
-	}
-	
 	@Override
 	public String toString() {
 		return "NameOfSubject: " + getNameOfSubject() + ", Year: " + getSubjectForYear();

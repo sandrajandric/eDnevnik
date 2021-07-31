@@ -6,6 +6,5 @@ import com.iktakademija.ednevnik.entities.GradeEntity;
 
 public interface GradeService {
 
-	Long existsTeacherSubjectStudent(Integer teacherId, Integer subjectId, Integer studentId); 
-	
+	List<GradeEntity> findGradesByStudent(Integer studentId);
 }

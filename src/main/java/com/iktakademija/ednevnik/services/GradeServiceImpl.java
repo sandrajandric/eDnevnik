@@ -1,10 +1,14 @@
 package com.iktakademija.ednevnik.services;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.stereotype.Service;
+
+import com.iktakademija.ednevnik.entities.GradeEntity;
 
 @Service
 public class GradeServiceImpl implements GradeService {
@@ -13,23 +17,16 @@ public class GradeServiceImpl implements GradeService {
 	private EntityManager em;
 	
 	@Override
-	public Long existsTeacherSubjectStudent(Integer teacherId, Integer subjectId, Integer studentId) {
-		
-		String sql = "SELECT COUNT (*) FROM GradeEntity g INNER JOIN g.teacherSubject s"
-				+ " WHERE g.student.id = :studentId AND s.teacher.id = :teacherId AND s.subject.id = :subjectId";
+	public List<GradeEntity> findGradesByStudent(Integer studenttId) {
+		String sql = "SELECT g FROM GradeEntity g INNER JOIN g.studentTeacherSubject sts"
+				+ " WHERE sts.studentt.id = :studenttId";
 		Query query = em.createQuery(sql);
 
-		query.setParameter("studentId", studentId);
-		query.setParameter("teacherId", teacherId);
-		query.setParameter("subjectId", subjectId);
+		query.setParameter("studenttId", studenttId);
 
-		Long result = (Long) query.getSingleResult();
+		List<GradeEntity> result = query.getResultList();
 
 		return result;
 	}
 
-	
-	
-	
-	
 }

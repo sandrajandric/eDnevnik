@@ -13,7 +13,7 @@ public interface TeacherSubjectRepository extends CrudRepository<TeacherSubjectE
 
 	TeacherSubjectEntity findBySubjectIdAndTeacherId(Integer subjectId, Integer teacherId);
 	
-	List<TeacherSubjectEntity> findBySubjectId(Integer subject);
+	TeacherSubjectEntity findBySubjectId(Integer subject);
 	
 	List<TeacherSubjectEntity> findByTeacherId(Integer teacher);
 	

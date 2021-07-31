@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -35,46 +36,57 @@ public class StudentEntity extends UserEntity {
 	@JoinColumn(name = "classs")
 	private ClassEntity classs;
 	
-	@JsonView(Views.Private.class)
-	@JsonBackReference(value = "tspp")
-	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "student")
-	private List<GradeEntity> listens = new ArrayList<>();
+	
+	
+	@JsonBackReference(value = "stsu")
+	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "studentt")
+	private List<StudentTeacherSubjectEntity> students = new ArrayList<>();
+	
 
 	public StudentEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public StudentEntity(ParentEntity parent, ClassEntity classs, List<GradeEntity> listens) {
+
+	public StudentEntity(ParentEntity parent, ClassEntity classs, List<StudentTeacherSubjectEntity> students) {
 		super();
 		this.parent = parent;
 		this.classs = classs;
-		this.listens = listens;
+		this.students = students;
 	}
+
 
 	public ParentEntity getParent() {
 		return parent;
 	}
 
+
 	public void setParent(ParentEntity parent) {
 		this.parent = parent;
 	}
+
 
 	public ClassEntity getClasss() {
 		return classs;
 	}
 
+
 	public void setClasss(ClassEntity classs) {
 		this.classs = classs;
 	}
 
-	public List<GradeEntity> getListens() {
-		return listens;
+
+	public List<StudentTeacherSubjectEntity> getStudents() {
+		return students;
 	}
 
-	public void setListens(List<GradeEntity> listens) {
-		this.listens = listens;
+
+	public void setStudents(List<StudentTeacherSubjectEntity> students) {
+		this.students = students;
 	}
+
+	
 	
 	
 }

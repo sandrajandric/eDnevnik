@@ -42,55 +42,68 @@ public class TeacherSubjectEntity {
 	@JoinColumn(name = "subject")
 	private SubjectEntity subject;
 	
-	@JsonManagedReference(value = "tse")
-	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "teacherSubject")
-	private List<GradeEntity> teacherSubjectStudent = new ArrayList<>();
+	
+	@JsonManagedReference(value = "sus")
+	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "subjectt")
+	private List<StudentTeacherSubjectEntity> subjects = new ArrayList<>();
+	
 
 	public TeacherSubjectEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
+
 	public TeacherSubjectEntity(Integer id, TeacherEntity teacher, SubjectEntity subject,
-			List<GradeEntity> teacherSubjectStudent) {
+			List<StudentTeacherSubjectEntity> subjects) {
 		super();
 		this.id = id;
 		this.teacher = teacher;
 		this.subject = subject;
-		this.teacherSubjectStudent = teacherSubjectStudent;
+		this.subjects = subjects;
 	}
+
 
 	public Integer getId() {
 		return id;
 	}
 
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
 
 	public TeacherEntity getTeacher() {
 		return teacher;
 	}
 
+
 	public void setTeacher(TeacherEntity teacher) {
 		this.teacher = teacher;
 	}
+
 
 	public SubjectEntity getSubject() {
 		return subject;
 	}
 
+
 	public void setSubject(SubjectEntity subject) {
 		this.subject = subject;
 	}
 
-	public List<GradeEntity> getTeacherSubjectStudent() {
-		return teacherSubjectStudent;
+
+	public List<StudentTeacherSubjectEntity> getSubjects() {
+		return subjects;
 	}
 
-	public void setTeacherSubjectStudent(List<GradeEntity> teacherSubjectStudent) {
-		this.teacherSubjectStudent = teacherSubjectStudent;
+
+	public void setSubjects(List<StudentTeacherSubjectEntity> subjects) {
+		this.subjects = subjects;
 	}
 
+	
+	
 	
 }

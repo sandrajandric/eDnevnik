@@ -50,23 +50,27 @@ public class GradeEntity {
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private LocalDate date;
 	
-	@JsonView(Views.Private.class)
-	@JsonManagedReference(value = "tspp")
-	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
-	@JoinColumn(name = "student")
-	private StudentEntity student;
 
-	@JsonBackReference(value = "tse")
+	@JsonManagedReference(value = "tse")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
-	@JoinColumn(name = "teacherSubject")
-	private TeacherSubjectEntity teacherSubject;
+	@JoinColumn(name = "studentTeacherSubject")
+	private StudentTeacherSubjectEntity studentTeacherSubject;
 	
 	@Version
 	private Integer version;
 
+	
+
+	public GradeEntity() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
 	public Integer getId() {
 		return id;
 	}
+
+
 
 	public void setId(Integer id) {
 		this.id = id;
@@ -110,55 +114,28 @@ public class GradeEntity {
 
 
 
-	public StudentEntity getStudent() {
-		return student;
+	public StudentTeacherSubjectEntity getStudentTeacherSubject() {
+		return studentTeacherSubject;
 	}
 
 
 
-	public void setStudent(StudentEntity student) {
-		this.student = student;
+	public void setStudentTeacherSubject(StudentTeacherSubjectEntity studentTeacherSubject) {
+		this.studentTeacherSubject = studentTeacherSubject;
 	}
 
-
-
-	public TeacherSubjectEntity getTeacherSubject() {
-		return teacherSubject;
-	}
-
-
-
-	public void setTeacherSubject(TeacherSubjectEntity teacherSubject) {
-		this.teacherSubject = teacherSubject;
-	}
 
 
 	public GradeEntity(Integer id,
 			@NotNull(message = "Grade type must not be null. Accepted values are: TEST, ORAL, CLASS_ACTIVITY") EGradeType gradeType,
 			@Range(min = 1, max = 5) @NotNull(message = "Grade must not be left blank. Accepted values are between {min} and {max}.") Integer grade,
-			LocalDate date, StudentEntity student, TeacherSubjectEntity teacherSubject) {
+			LocalDate date, StudentTeacherSubjectEntity studentTeacherSubject) {
 		super();
 		this.id = id;
 		this.gradeType = gradeType;
 		this.grade = grade;
 		this.date = date;
-		this.student = student;
-		this.teacherSubject = teacherSubject;
-	}
-
-
-
-	public GradeEntity() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-
-
-	@Override
-	public String toString() {
-		return "GradeType: " + getGradeType() + "\nGrade: " + getGrade() + "\nDate: " + getDate() +
-				"\nStudent: " + getStudent() + "\nTeacher&Subject: " + getTeacherSubject();
+		this.studentTeacherSubject = studentTeacherSubject;
 	}
 
 }

@@ -9,5 +9,5 @@ import com.iktakademija.ednevnik.entities.StudentEntity;
 
 public interface GradeRepository extends CrudRepository<GradeEntity, Integer> {
 
-	List<GradeEntity> findByStudent(Integer studentId);
+//	List<GradeEntity> findByStudent(Integer studentId);
 }

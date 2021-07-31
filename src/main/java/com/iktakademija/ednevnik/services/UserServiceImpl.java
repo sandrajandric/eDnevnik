@@ -7,12 +7,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService {
 
-	@Override
-	public String getLoggedUser() {
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-		String username = principal.toString();
-		return username;
-	}
 
 }
